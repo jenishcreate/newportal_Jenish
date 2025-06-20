@@ -33,6 +33,19 @@ namespace newportal.Areas.Distributor.Controllers
 
             return Json(new { data = objDataList });
         }
+        public IActionResult RechargeTransaction()
+        {
+            return View();
+        }
 
+     
+        public async Task<JsonResult> RechargeTransactionJinDistributorson()
+        {
+            string? userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            IEnumerable<RechargeTransaction> objDataList = await _unitOfWork.Rechargetransaction.GetTransactionByParentIdAsync(userid, DateTime.Today, DateTime.Today);
+
+            return Json(new { data = objDataList });
+        }
     }
 }

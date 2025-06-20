@@ -75,35 +75,38 @@ namespace newportal.Areas.Distributor.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> CreditAmountPost(string touserId, double amount)
+        public async Task<IActionResult> CreditAmountPost(string touserId, double amount, string Tpin, string? remarks)
         {
 
             string initiatesuserid = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
+            var initiatesuseeData = await _unitOfWork.User.CurrentUserData(initiatesuserid);
             if (ModelState.IsValid)
             {
                 var user = await _unitOfWork.User.CurrentUserData(touserId);
                 Wallet walletobj = await _unitOfWork.Wallet.GetUserWalletDataAsync(touserId);
                 if (user.ParentUserId == initiatesuserid || user.L2_ParentUserId == initiatesuserid || initiatesuserid == adminId)
                 {
-
-                    if (user != null)
+                    if (Tpin == initiatesuseeData.TPIN)
                     {
-                        WalletOperationResult reasult = await _unitOfWork.Wallet.TransferWalletAsync(initiatesuserid, touserId, amount, initiatesuserid, "");
 
-                        if (reasult != null)
+                        if (user != null)
                         {
-                            if (reasult.Success == true)
+                            WalletOperationResult reasult = await _unitOfWork.Wallet.TransferWalletAsync(initiatesuserid, touserId, amount, initiatesuserid, "");
+
+                            if (reasult != null)
                             {
-                                TempData["fundsuccess"] = reasult.Message;
-                            }
-                            else
-                            {
-                                TempData["Funderror"] = reasult.Message;
+                                if (reasult.Success == true)
+                                {
+                                    TempData["fundsuccess"] = reasult.Message;
+                                }
+                                else
+                                {
+                                    TempData["Funderror"] = reasult.Message;
+                                }
                             }
                         }
                     }
-
+                    TempData["error"] = "Incorrect Tpin";
                 }
                 else
                 {
@@ -141,9 +144,10 @@ namespace newportal.Areas.Distributor.Controllers
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> DebitAmountPost(string fromuserId, double amount, string? remarks = null)
+        public async Task<IActionResult> DebitAmountPost(string fromuserId, double amount,  string Tpin, string? remarks = null)
         {
             string initiatesuserid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var initiatesuseeData = await _unitOfWork.User.CurrentUserData(initiatesuserid);
             if (ModelState.IsValid)
             {
                 var user = await _unitOfWork.User.CurrentUserData(fromuserId);
@@ -151,32 +155,36 @@ namespace newportal.Areas.Distributor.Controllers
 
                 if (user.ParentUserId == initiatesuserid || user.L2_ParentUserId == initiatesuserid || initiatesuserid == adminId)
                 {
-                    if (user != null)
+                    if (Tpin == initiatesuseeData.TPIN)
                     {
-                        WalletOperationResult reasult = _unitOfWork.Wallet.TransferWalletAsync(fromuserId, initiatesuserid, amount, initiatesuserid, remarks).Result;
 
-                        if (reasult != null)
+                        if (user != null)
                         {
-                            if (reasult.Success == true)
+                            WalletOperationResult reasult = _unitOfWork.Wallet.TransferWalletAsync(fromuserId, initiatesuserid, amount, initiatesuserid, remarks).Result;
+
+                            if (reasult != null)
                             {
-                                TempData["fundsuccess"] = reasult.Message;
+                                if (reasult.Success == true)
+                                {
+                                    TempData["fundsuccess"] = reasult.Message;
+                                }
+                                else
+                                {
+                                    TempData["Funderror"] = reasult.Message;
+                                }
                             }
                             else
                             {
-                                TempData["Funderror"] = reasult.Message;
+                                TempData["error"] = "Failed to debit amount.";
                             }
-                        }
-                        else
-                        {
-                            TempData["error"] = "Failed to debit amount.";
-                        }
 
 
+                        }
                     }
-                    else
-                    {
-                        TempData["error"] = "User not found.";
-                    }
+
+                   
+                        TempData["error"] = "Incorrect Tpin";
+                   
                 }
                 else
                 {

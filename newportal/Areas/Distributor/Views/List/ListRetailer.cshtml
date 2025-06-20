@@ -106,7 +106,11 @@
                     { "data": "mobileNo" },
                     { "data": "userType" },
                     { "data": "emailId" },
-                    { "data": "walletBalance" },
+                    { "data": "walletBalance",
+                         render: function (data) {
+                       return `<span style="background-color: #d4edda; color: #155724; padding: 4px 8px; border-radius: 4px; display: inline-block;">₹${data}</span>`;
+                                    }
+                                },
                     {
                         "data": "joinDate",
                         "render": function (data) {

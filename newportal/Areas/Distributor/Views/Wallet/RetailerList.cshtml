@@ -105,15 +105,35 @@
                     { "data": "mobileNo" },
                     { "data": "userType" },
                     { "data": "emailId" },
-                    { "data": "walletBalance" },
+                    { "data": "walletBalance",
+            render: function (data) {
+                return `<span style="background-color: #d4edda; color: #155724; padding: 4px 8px; border-radius: 4px; display: inline-block;">₹${data}</span>`;
+            }
+        },
                     {
                         "data": "joinDate",
                         "render": function (data) {
                             return data ? new Date(data).toLocaleDateString() : '';
                         }
                     },
-                 
-                    { "data": "kycStatus" },
+
+                    { "data": "kycStatus" ,
+                        "render": function (data) {
+                            switch (data) {
+                                case 0:
+                                case "Approved":
+                                   return '<span class="badge bg-success">Approved</span>';
+                                case 1:
+                                case "Pending":
+                                   return '<span class="badge bg-warning">Pending</span>';
+                                case 2:
+                                case "Rejected":
+                                   return '<span class="badge bg-danger">Rejected</span>';
+                                default:
+                                    return '<span class="badge bg-secondary">Kyc Not Submited</span>';
+                            }
+                        }
+                    },
                     {
                         "data": "status",
                         "render": function (data) {

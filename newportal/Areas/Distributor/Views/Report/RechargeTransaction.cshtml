@@ -49,7 +49,6 @@
         width: 3rem;
         height: 3rem;
     }
-
 </style>
 
 <div class="container-fluid px-3 mt-3">
@@ -89,14 +88,20 @@
                     <th>No</th>
                     <th>Txn ID</th>
                     <th>User</th>
-                    <th>Mobile No</th>
+                    <th>User Mobile No</th>
+                    <th>User Company</th>
+                    <th>Customer Mobile No</th>
                     <th>Operator</th>
+                    <th>Fetch Bill Amount</th>
                     <th>Status</th>
                     <th>Circle</th>
                     <th>Recharge Type</th>
                     <th>Recharge Amount</th>
                     <th>Debited Amount</th>
                     <th>Last Balance</th>
+                    <th>Gst</th>
+                    <th>Description</th>
+                    <th>Bank Responce Status</th>
                     <th>Date</th>
                 </tr>
             </thead>
@@ -125,7 +130,7 @@
             // Initialize DataTable
             dataTable = $('#retailerTable').DataTable({
                 "ajax": {
-                    "url": "/Retailer/Report/RechargeTransactionJson",
+                    "url": "/Distributor/Report/RechargeTransactionJinDistributorson",
                     "type": "POST",
                     "datatype": "json",
                     "headers": {
@@ -152,6 +157,8 @@
                     },
                     { data: 'recharge_transaction_id' },
                     { data: 'initiated_UserName' },
+                    { data: 'initiated_User_number'},
+                    { data: 'initiated_companyname'},
                     { data: 'customer_MobileNumber' },
                         {
             data: 'mobileNumber_operator',
@@ -169,6 +176,7 @@
             return `<span class="badge" style="${style}">${data}</span>`;
         }
         },
+                    { data: 'bill_Amount_Fetch' },
         {
             data: 'status',
             render: function (data) {
@@ -191,7 +199,7 @@
                 style = 'background-color: #dc3545; color: white;'; // Red
             } else if (data === 'Prepaid') {
                 style = 'background-color: #007bff; color: white;'; // Yellow
-            } 
+            }
             return `<span class="badge" style="${style}">${data}</span>`;
             }},
                            {
@@ -205,8 +213,15 @@
             render: function (data) {
                 return `<span style="background-color: #fbd9d3; color: #900000; padding: 4px 8px; border-radius: 4px; display: inline-block;">₹${data}</span>`;
             } },
-                    { data: 'last_updatedbalance' },
-                
+                    { data: 'last_updatedbalance' ,
+            render: function (data) {
+                return `<span>₹${data}</span>`;
+            } },
+                    { data: 'gst' },
+                    { data: 'description' },
+                    
+                    { data: 'bbpS_status' },
+
                 {
                     data: 'transactionDate',
                     render: function (data) {

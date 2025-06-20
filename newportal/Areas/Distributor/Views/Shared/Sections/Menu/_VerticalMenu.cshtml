@@ -50,7 +50,7 @@
 
 
         <!-- Reports -->
-        <li class="menu-item @(ActiveClass("/Distributor/Report/WalletTransacctions"))">
+        <li class="menu-item @(ActiveClass("/Distributor/Report/WalletTransacctions")) @(ActiveClass("/Distributor/Report/RechargeTransaction"))">
             <a href="javascript:void(0);" class="menu-link menu-toggle @(ActiveClass("/Distributor/Report/WalletTransacctions"))">
                 <i class="menu-icon tf-icons bx bxs-report"></i>
                 <div>Reports </div>
@@ -59,6 +59,11 @@
                 <li class="menu-item @(IsActive("/Distributor/Report/WalletTransacctions") ? "active" : "")">
                     <a asp-area="Distributor" asp-controller="Report" asp-action="WalletTransacctions" class="menu-link @(ActiveClass("/Distributor/Report/WalletTransacctions", "sub"))">
                         <div>All Wallet Transactions</div>
+                    </a>
+                </li> 
+                <li class="menu-item @(IsActive("/Distributor/Report/RechargeTransaction") ? "active" : "")">
+                    <a asp-area="Distributor" asp-controller="Report" asp-action="RechargeTransaction" class="menu-link @(ActiveClass("/Distributor/Report/RechargeTransaction", "sub"))">
+                        <div>Recharge Transactions</div>
                     </a>
                 </li>
                 

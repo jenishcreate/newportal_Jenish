@@ -161,7 +161,10 @@
                             return data ? new Date(data).toLocaleTimeString() : '';
                         }
                     },
-                    { "data": "amount" },
+                    { "data": "amount" ,
+            render: function (data) {
+                return `<span style=" color: #155724; padding: 4px 8px; border-radius: 4px; display: inline-block;">₹${data}</span>`;
+            } },
                     { "data": "linkedServiceTransactionId" },
                     {
                         "data": "transactionType",

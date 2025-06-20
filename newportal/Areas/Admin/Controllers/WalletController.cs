@@ -145,7 +145,6 @@ namespace newportal.Areas.Admin.Controllers
                                 TempData["error"] = "User not found.";
                             }
 
-
                     }
                     else
                     {
