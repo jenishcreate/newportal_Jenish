@@ -1,0 +1,291 @@
+﻿@model newportal.Models.ViewModel.UserData_VM
+@{
+    ViewData["Title"] = "Edit KYC";
+}
+<form asp-action="EditKyc" asp-controller="Kyc" asp-area="NoKyc" method="post" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+
+    <div class="container mt-4 ">
+        <div class="alert alert-danger  show text-center" role="alert">
+            <strong>Your KYC Request Is Rejected </strong>
+
+        </div>
+        <h2 class="text-center mb-4">Resubmit KYC</h2>
+        
+        @if (!string.IsNullOrEmpty(Model.UserData.AdminRemarks))
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>Rejection Reason: </strong>  @Model.UserData.AdminRemarks 
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+       
+    </div>
+    
+        <div class="card mb-4">
+            <div class="card-header">Documents</div>
+            <div class="card-body row g-4">
+            <div class="col-md-4 doc-wrapper">
+                <label class="form-label">Aadhaar Front</label>
+                <div class="image-box position-relative">
+                    @if (!string.IsNullOrEmpty(Model.UserData.Adhar_Front_Photo_Url))
+                    {
+                        <img src="@Model.UserData.Adhar_Front_Photo_Url" class="preview-img popup-img" data-src="@Model.UserData.Adhar_Front_Photo_Url" />
+                        
+                    }
+                    <input type="hidden" name="RemoveAdharFront" id="RemoveAdharFront" value="false" />
+                </div>
+                <input type="file" name="AadhaarFront" class="form-control mt-2" />
+            </div>
+
+            <!-- Aadhaar Back -->
+            <div class="col-md-4 doc-wrapper">
+                <label class="form-label">Aadhaar Back</label>
+                <div class="image-box position-relative">
+                    @if (!string.IsNullOrEmpty(Model.UserData.Adhar_Back_Photo_Url))
+                    {
+                        <img src="@Model.UserData.Adhar_Back_Photo_Url" class="preview-img popup-img" data-src="@Model.UserData.Adhar_Back_Photo_Url" />
+                       
+                    }
+                    <input type="hidden" name="RemoveAdharBack" id="RemoveAdharBack" value="false" />
+                </div>
+                <input type="file" name="AadhaarBack" class="form-control mt-2" />
+            </div>
+
+            <!-- PAN -->
+            <div class="col-md-4 doc-wrapper">
+                <label class="form-label">PAN Image</label>
+                <div class="image-box position-relative">
+                    @if (!string.IsNullOrEmpty(Model.UserData.Pan_Photo_Url))
+                    {
+                        <img src="@Model.UserData.Pan_Photo_Url" class="preview-img popup-img" data-src="@Model.UserData.Pan_Photo_Url" />
+                       
+                    }
+                    <input type="hidden" name="RemovePan" id="RemovePan" value="false" />
+                </div>
+                <input type="file" name="PanImage" class="form-control mt-2" />
+            </div>
+
+            <!-- Profile -->
+            <div class="col-md-4 doc-wrapper">
+                <label class="form-label">Profile Picture</label>
+                <div class="image-box position-relative">
+                    @if (!string.IsNullOrEmpty(Model.UserData.ProfilePicture))
+                    {
+                        <img src="@Model.UserData.ProfilePicture" class="preview-img popup-img"  data-src="@Model.UserData.ProfilePicture" />
+                       
+                    }
+                    <input type="hidden" name="RemoveProfile" id="RemoveProfile" value="false" />
+                </div>
+                <input type="file" name="ProfilePicture" class="form-control mt-2" />
+            </div>
+
+            <!-- Cheque -->
+            <div class="col-md-4 doc-wrapper">
+                <label class="form-label">Cancelled Cheque</label>
+                <div class="image-box position-relative">
+                    @if (!string.IsNullOrEmpty(Model.UserData.Blank_Check_Photo_Url))
+                    {
+                        <img src="@Model.UserData.Blank_Check_Photo_Url" class="preview-img popup-img"  data-src="@Model.UserData.Blank_Check_Photo_Url" />
+                        
+                    }
+                    <input type="hidden" name="RemoveCheque" id="RemoveCheque" value="false" />
+                </div>
+                <input type="file" name="Blankcheque" class="form-control mt-2" />
+            </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">Verification </div>
+            <div class="card-body row g-3">
+                <div class="col-md-6 mb-3">
+                    <label>Aadhaar Number</label>
+                    <input asp-for="UserData.Adhar_No" placeholder="Enter Aadhar Number" class="form-control" required />
+                    <button type="button" class="btn btn-sm btn-primary mt-2">Send OTP</button>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label>OTP</label>
+                    <input type="text" class="form-control" placeholder="Enter OTP" />
+                    <button type="button" class="btn btn-sm btn-success mt-2">Verify OTP</button>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label>PAN Number</label>
+                    <input asp-for="UserData.Pan_No" placeholder="Enter PAN Number" class="form-control" required />
+                </div>
+               
+            </div>
+        </div>
+
+
+        <!-- Other Inputs (Name, Address, etc.) -->
+        <div class="card mb-4">
+            <div class="card-header">Basic Info</div>
+            <div class="card-body row g-3">
+
+                <div class="col-md-4">
+                    <label>First Name</label>
+                    <input asp-for="UserData.FirstName" class="form-control" required />
+                </div>
+                <div class="col-md-4">
+                    <label>Middle Name</label>
+                    <input asp-for="UserData.MiddleName" class="form-control" required />
+                </div>
+                <div class="col-md-4">
+                    <label>Last Name</label>
+                    <input asp-for="UserData.LastName" class="form-control" required />
+                </div>
+
+                <br />
+                <div class="col-md-4">
+                    <label>Date of Birth</label>
+                    <input asp-for="UserData.DOB" type="date" class="form-control" required />
+                </div>
+                <div class="col-md-4">
+                    <label>Gender</label>
+                    <select asp-for="UserData.Gender" class="form-control" required>
+                        <option value="">Select Gender</option>
+                        <option>Male</option>
+                        <option>Female</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label>Company Name</label>
+                    <input asp-for="UserData.Companyname" class="form-control" />
+                </div>
+                <div class="col-md-12">
+                    <label>Address</label>
+                    <input asp-for="UserData.Address" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label>City</label>
+                    <input asp-for="UserData.City" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label>State</label>
+                    <input asp-for="UserData.State" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label>Country</label>
+                    <input asp-for="UserData.Country" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label>Pin Code</label>
+                    <input asp-for="UserData.PinCode" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label>Udhyam No</label> 
+                    <input asp-for="UserData.Udhyam_Adhar_NO" placeholder=" Enter Udhyam Aadhar Number" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label>GST No</label>
+                    <input asp-for="UserData.GST_NO" placeholder="Enter GST Number" class="form-control" />
+                </div>
+            </div>
+        </div>
+
+        <!-- OTP Block -->
+        <div class="card mb-4">
+            <div class="card-header">Verify Contact</div>
+            <div class="card-body row g-3">
+                <div class="col-md-6">
+                    <label>Email</label>
+                <input placeholder="Enter Email Address" value="@ViewBag.email" id="Email" class="form-control" readonly />
+                <button type="button" id="Emailotpsend" class="btn btn-sm btn-primary mt-2" >Send OTP</button>
+                </div>
+                <div class="col-md-6">
+                    <label>Email OTP</label>
+                    <input type="text" id="emialotp" class="form-control" placeholder="Enter Email OTP" />
+                <button type="button" id="emialotpverify" class="btn btn-sm btn-success mt-2" >Verify</button>
+                </div>
+                <div class="col-md-6">
+                    <label>Phone</label>
+                <input placeholder="Enter Phone Number" value="@ViewBag.mobile" id="phone" class="form-control" readonly />
+                <button type="button" id="phoneotpsend" class="btn btn-sm btn-primary mt-2" >Send OTP</button>
+                </div>
+                <div class="col-md-6">
+                    <label>Phone OTP</label>
+                    <input type="text" class="form-control" id="phoneotp" placeholder="Enter Phone OTP" />
+                <button type="button" id="phonneotpverify" class="btn btn-sm btn-success mt-2">Verify</button>
+                </div>
+                <div class="col-md-6">
+                    <label>WhatsApp No</label>
+                <input placeholder="Enter Whatsapp Number" value="@ViewBag.whatsAppNo" id="whatsappno" class="form-control" readonly />
+                <button type="button" id="whatsappotpsend" class="btn btn-sm btn-primary mt-2">Send OTP</button>
+                </div>
+                <div class="col-md-6">
+                    <label>Whatsapp OTP</label>
+                    <input type="text" id="whatsappotp" class="form-control" placeholder="Enter Whatsapp OTP" />
+                <button type="button" id="whatsappotpverify" class="btn btn-sm btn-success mt-2">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-lg btn-primary">Submit Updated KYC</button>
+        </div>
+    </div>
+</form>
+
+<style>
+    .doc-wrapper .image-box {
+        display: inline-block;
+    }
+
+    .preview-img {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+    }
+
+    
+
+    .doc-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+    }
+</style>
+<style>
+    .preview-img {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+    }
+
+   
+</style>
+
+<!-- Image Preview Modal -->
+<div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-labelledby="imagePreviewLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-light">
+            <div class="modal-header border-0">
+               
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" class="img-fluid rounded shadow" style="max-height: 80vh;" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const modal = new bootstrap.Modal(document.getElementById("imagePreviewModal"));
+            const modalImg = document.getElementById("modalImage");
+
+            document.querySelectorAll(".popup-img").forEach(img => {
+                img.addEventListener("click", function () {
+                    const fullSrc = img.getAttribute("data-src");
+                    modalImg.src = fullSrc;
+                    modal.show();
+                });
+            });
+        });
+    </script>
+}
+

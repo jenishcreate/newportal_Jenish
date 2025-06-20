@@ -1,0 +1,26 @@
+﻿@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+        <strong> @TempData["Success"] </strong> Your Kyc Details will Review in 2-3 Working Days ...
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<a asp-area="NoKyc" asp-action="KycDetails" asp-controller="Kyc">
+    <button class="btn btn-primary m-5">See KYC Details</button>
+</a>
+
+<div class="container mt-5">
+    <div class="card p-4 shadow-sm" style="max-width: 600px; margin: 0 auto; border-radius: 1rem;">
+        <div class="text-center">
+            <img src="@Url.Content("~/img/backgrounds/Kycsubmit.png")" alt="KYC Submitted" style="height: 120px;" class="mb-4" />
+            <h3 class="text-primary">KYC Submitted Successfully</h3>
+            <p class="text-muted mt-3 fs-5">
+                Your KYC has been submitted and will be reviewed within <strong>2–3 working days</strong>.
+            </p>
+            <p class="text-success fw-bold mt-2">
+                You will be notified once your verification is complete.
+            </p>
+        </div>
+    </div>
+</div>

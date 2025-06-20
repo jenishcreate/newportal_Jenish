@@ -1,0 +1,716 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<style>
+    :root {
+        --primary-color: #696CFF;
+        --primary-light: rgba(105, 108, 255, 0.1);
+        --primary-gradient: linear-gradient(135deg, #696CFF, #8B5CF6, #A855F7);
+    }
+
+    .page-wrapper {
+        padding: 1.5rem;
+        background-color: #fafbfc;
+    }
+
+    .welcome-section {
+        background: #ffffff;
+        border-radius: 0.75rem;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        color: #2d3748;
+        position: relative;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+        .welcome-section h2 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #1a202c;
+        }
+
+        .welcome-section p {
+            color: #718096;
+            margin-bottom: 1.5rem;
+            font-weight: 400;
+        }
+
+    .balance-section {
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        background: #f7fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.75rem;
+        padding: 1.25rem 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: #2d3748;
+        font-size: 0.875rem;
+        min-width: 200px;
+    }
+
+    .balance-amount {
+        font-weight: 700;
+        font-size: 1.5rem;
+        color: var(--primary-color);
+    }
+
+    .refresh-btn {
+        background: none;
+        border: none;
+        color: #718096;
+        cursor: pointer;
+        padding: 0.375rem;
+        border-radius: 0.375rem;
+        transition: all 0.2s;
+    }
+
+        .refresh-btn:hover {
+            background: var(--primary-light);
+            color: var(--primary-color);
+        }
+
+    .section-title {
+        font-weight: 600;
+        font-size: 1.125rem;
+        margin: 2rem 0 1rem 0;
+        color: #2d3748;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        border: 1px solid #f1f5f9;
+        position: relative;
+        background-clip: padding-box;
+    }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 0.75rem;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(105, 108, 255, 0.3), rgba(139, 92, 246, 0.2), rgba(168, 85, 247, 0.2));
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: xor;
+            -webkit-mask-composite: xor;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(105, 108, 255, 0.08);
+            border-color: rgba(105, 108, 255, 0.2);
+        }
+
+            .stat-card:hover::before {
+                opacity: 0.6;
+            }
+
+    .stat-card-content {
+        display: flex;
+        justify-content: between;
+        align-items: flex-start;
+    }
+
+    .stat-info {
+        flex: 1;
+    }
+
+    .stat-label {
+        color: #718096;
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+        font-weight: 400;
+    }
+
+    .stat-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-change {
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .positive-change {
+        color: #38a169;
+    }
+
+    .negative-change {
+        color: #e53e3e;
+    }
+
+    .stat-card-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        background: rgba(105, 108, 255, 0.06);
+        border: 1px solid rgba(105, 108, 255, 0.15);
+        color: var(--primary-color);
+        margin-left: 1rem;
+    }
+
+    .management-section {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .management-card {
+        background: white;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        text-decoration: none;
+        color: inherit;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        position: relative;
+        background-clip: padding-box;
+    }
+
+        .management-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 0.75rem;
+            padding: 2px;
+            background: var(--primary-gradient);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: xor;
+            -webkit-mask-composite: xor;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .management-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(105, 108, 255, 0.15);
+            text-decoration: none;
+            color: inherit;
+        }
+
+            .management-card:hover::before {
+                opacity: 1;
+            }
+
+    .management-card-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        background: var(--primary-light);
+        border: 2px solid rgba(105, 108, 255, 0.3);
+        color: var(--primary-color);
+    }
+
+    .management-card h5 {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #2d3748;
+        font-size: 1rem;
+        transition: color 0.3s ease;
+    }
+
+    .management-card:hover h5 {
+        color: var(--primary-color);
+    }
+
+    .management-card p {
+        color: #718096;
+        font-size: 0.875rem;
+        margin: 0;
+        font-weight: 400;
+    }
+
+    .chart-container {
+        background: white;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e2e8f0;
+    }
+
+    .chart-header {
+        display: flex;
+        justify-content: between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .chart-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #2d3748;
+        margin: 0;
+    }
+
+    .chart-placeholder {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #718096;
+        border: 2px dashed #e2e8f0;
+        border-radius: 0.5rem;
+        background: #f7fafc;
+    }
+
+    .top-retailers {
+        background: white;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e2e8f0;
+    }
+
+    .retailer-item {
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: between;
+        align-items: center;
+    }
+
+        .retailer-item:last-child {
+            border-bottom: none;
+        }
+
+    .retailer-name {
+        font-weight: 500;
+        color: #2d3748;
+    }
+
+    .retailer-volume {
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+
+    .activity-table {
+        background: white;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e2e8f0;
+    }
+
+    .table {
+        margin: 0;
+    }
+
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.375rem 0.75rem;
+    }
+
+    .bg-success {
+        background-color: #38a169 !important;
+    }
+
+    .footer-section {
+        margin-top: 2.5rem;
+        padding: 1.5rem 0;
+        border-top: 1px solid #e2e8f0;
+        text-align: center;
+        color: #718096;
+        font-size: 0.875rem;
+        font-weight: 400;
+    }
+
+    /* Media Queries */
+    @@media (max-width: 768px) {
+        .balance-section
+
+    {
+        position: static;
+        margin-top: 1rem;
+        min-width: auto;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .management-section {
+        grid-template-columns: 1fr;
+    }
+
+    }
+    }
+
+    /* Loading animation for refresh button */
+    .refresh-btn.loading {
+        animation: spin 0.6s linear infinite;
+    }
+
+    @@keyframes spin {
+        from
+
+    {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+
+    } 
+    }
+</style>
+
+<div class="container-fluid page-wrapper">
+    <!-- Welcome Section -->
+    <div class="welcome-section">
+        <div class="balance-section">
+            <span>₹</span>
+            <span id="balance" class="balance-amount">0.00</span>
+            <span>Available Balance</span>
+            <button class="refresh-btn" id="refreshIcon">
+                <i class="bx bx-refresh"></i>
+            </button>
+        </div>
+
+        <h2 id="userName">Hi, Loading...</h2>
+        <p>Manage your retailer network with NexamPay</p>
+        <div id="companyName" class="">Loading company...</div>
+    </div>
+
+    <!-- Statistics Section -->
+    <div class="section-title">
+        <span>Business Overview</span>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-card-content">
+                <div class="stat-info">
+                    <p class="stat-label">Total Volume</p>
+                    <h3 class="stat-value">₹1,24,856</h3>
+                    <span class="stat-change positive-change">
+                        
+                    </span>
+                </div>
+                <div class="stat-card-icon">
+                    <i class="bx bx-line-chart"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-card-content">
+                <div class="stat-info">
+                    <p class="stat-label">Active Retailers</p>
+                    <h3 class="stat-value">142</h3>
+                    <span class="stat-change positive-change">
+                 
+                    </span>
+                </div>
+                <div class="stat-card-icon">
+                    <i class="bx bx-user-plus"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-card-content">
+                <div class="stat-info">
+                    <p class="stat-label">Commission Earned</p>
+                    <h3 class="stat-value">₹12,485</h3>
+                    <span class="stat-change positive-change">
+                       
+                    </span>
+                </div>
+                <div class="stat-card-icon">
+                    <i class="bx bx-rupee"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-card-content">
+                <div class="stat-info">
+                    <p class="stat-label">Success Rate</p>
+                    <h3 class="stat-value">98.6%</h3>
+                    <span class="stat-change negative-change">
+                      
+                    </span>
+                </div>
+                <div class="stat-card-icon">
+                    <i class="bx bx-check-circle"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Management Tools Section -->
+    <div class="section-title">
+        <span>Management Tools</span>
+    </div>
+
+    <div class="management-section">
+        <a href="#" class="management-card">
+            <div class="management-card-icon">
+                <i class="bx bx-user-plus"></i>
+            </div>
+            <h5>Retailer Management</h5>
+            <p>Add, edit, and manage your retailer network</p>
+        </a>
+
+        <a href="#" class="management-card">
+            <div class="management-card-icon">
+                <i class="bx bx-wallet"></i>
+            </div>
+            <h5>Fund Management</h5>
+            <p>Transfer funds and manage retailer balances</p>
+        </a>
+
+        <a href="#" class="management-card">
+            <div class="management-card-icon">
+                <i class="bx bx-bar-chart-alt-2"></i>
+            </div>
+            <h5>Reports & Analytics</h5>
+            <p>View detailed reports and business analytics</p>
+        </a>
+
+        <a href="#" class="management-card">
+            <div class="management-card-icon">
+                <i class="bx bx-cog"></i>
+            </div>
+            <h5>Commission Settings</h5>
+            <p>Configure commission rates and schemes</p>
+        </a>
+
+        <a href="#" class="management-card">
+            <div class="management-card-icon">
+                <i class="bx bx-history"></i>
+            </div>
+            <h5>Transaction History</h5>
+            <p>Monitor all transactions across your network</p>
+        </a>
+
+        <a href="#" class="management-card">
+            <div class="management-card-icon">
+                <i class="bx bx-support"></i>
+            </div>
+            <h5>Support & Tickets</h5>
+            <p>Manage support requests and tickets</p>
+        </a>
+    </div>
+
+    <!-- Charts and Analytics Section -->
+    <div class="row" style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+        <!-- Volume Chart -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <h5 class="chart-title">Transaction Volume (Last 7 Days)</h5>
+                <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-secondary active">Weekly</button>
+                    <button class="btn btn-outline-secondary">Monthly</button>
+                </div>
+            </div>
+            <div class="chart-placeholder">
+                <i class="bx bx-bar-chart-alt-2" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+                <p>Transaction Volume Chart</p>
+                <small>Analytics data will be displayed here</small>
+            </div>
+        </div>
+
+        <!-- Top Retailers -->
+        <div class="top-retailers">
+            <h5 class="chart-title" style="margin-bottom: 1.5rem;">Top Performing Retailers</h5>
+            <div class="retailer-item">
+                <span class="retailer-name">Mohan Enterprises</span>
+                <span class="retailer-volume">₹24,560</span>
+            </div>
+            <div class="retailer-item">
+                <span class="retailer-name">Shivam Telecom</span>
+                <span class="retailer-volume">₹18,750</span>
+            </div>
+            <div class="retailer-item">
+                <span class="retailer-name">Ganesh Stores</span>
+                <span class="retailer-volume">₹15,230</span>
+            </div>
+            <div class="retailer-item">
+                <span class="retailer-name">Sai Services</span>
+                <span class="retailer-volume">₹12,890</span>
+            </div>
+            <div class="retailer-item">
+                <span class="retailer-name">City Mobile Zone</span>
+                <span class="retailer-volume">₹10,450</span>
+            </div>
+            <div class="text-end mt-2">
+                <a href="#" class="text-decoration-none small" style="color: var(--primary-color);">View all retailers →</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="section-title">Recent Activity</div>
+    <div class="activity-table">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Retailer</th>
+                        <th>Activity</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Today, 10:45 AM</td>
+                        <td>Mohan Enterprises</td>
+                        <td>AEPS Withdrawal</td>
+                        <td>₹5,000</td>
+                        <td><span class="badge bg-success">Completed</span></td>
+                    </tr>
+                    <tr>
+                        <td>Today, 09:30 AM</td>
+                        <td>Shivam Telecom</td>
+                        <td>DMT Transfer</td>
+                        <td>₹2,500</td>
+                        <td><span class="badge bg-success">Completed</span></td>
+                    </tr>
+                    <tr>
+                        <td>Today, 09:15 AM</td>
+                        <td>Ganesh Stores</td>
+                        <td>Mobile Recharge</td>
+                        <td>₹199</td>
+                        <td><span class="badge bg-success">Completed</span></td>
+                    </tr>
+                    <tr>
+                        <td>Yesterday, 05:20 PM</td>
+                        <td>Sai Services</td>
+                        <td>BBPS Payment</td>
+                        <td>₹1,200</td>
+                        <td><span class="badge bg-success">Completed</span></td>
+                    </tr>
+                    <tr>
+                        <td>Yesterday, 03:45 PM</td>
+                        <td>City Mobile Zone</td>
+                        <td>AEPS Deposit</td>
+                        <td>₹3,000</td>
+                        <td><span class="badge bg-success">Completed</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+   
+</div>
+
+@section Scripts {
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+
+    <script>
+        function loadBalance() {
+            $.ajax({
+                url: '/Distributor/Dashboard/GetDistributorBalance',
+                method: 'GET',
+                success: function (response) {
+                    if (response && response.balance !== undefined) {
+                        $('#balance').text(response.balance.toFixed(2));
+                    } else {
+                        $('#balance').text('0.00');
+                    }
+                },
+                error: function () {
+                    $('#balance').text('0.00');
+                }
+            });
+        }
+
+        function loadUserInfo() {
+            $.ajax({
+                url: '/Distributor/Dashboard/GetUserInfo',
+                method: 'GET',
+                success: function (response) {
+                    if (response) {
+                        if (response.userName) {
+                            $('#userName').text('Hi, ' + response.userName);
+                        } else {
+                            $('#userName').text('Hi, Distributor');
+                        }
+
+                        if (response.companyName) {
+                            $('#companyName').text(response.companyName);
+                        } else {
+                            $('#companyName').text('Distributor Network');
+                        }
+                    }
+                },
+                error: function () {
+                    $('#userName').text('Hi, Distributor');
+                    $('#companyName').text('Distributor Network');
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            loadBalance();
+            loadUserInfo();
+
+            $('#refreshIcon').on('click', function () {
+                $(this).addClass('loading');
+                setTimeout(() => {
+                    $(this).removeClass('loading');
+                }, 800);
+                loadBalance();
+            });
+
+            $('.management-card, .stat-card').hover(
+                function() {
+                    $(this).addClass('shadow-lg');
+                },
+                function() {
+                    $(this).removeClass('shadow-lg');
+                }
+            );
+        });
+    </script>
+}

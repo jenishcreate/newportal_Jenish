@@ -1,0 +1,178 @@
+﻿@{
+    ViewData["Title"] = "Retailer Services";
+}
+<form id="csrfForm">@Html.AntiForgeryToken()</form>
+
+<style>
+    /* Matching styles with Retailer List */
+    #kycTable thead th {
+    border-bottom: 2px solid #616161 !important;
+    color: #212121;
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    }
+
+    #kycTable td {
+    background-color: #ffffff;
+    vertical-align: middle;
+    font-size: 15px;
+    color: #212121;
+    }
+
+    #kycTable td:first-child {
+    font-weight: 600;
+    text-align: center;
+    }
+
+    div.dataTables_filter {
+    margin-top: 0.75rem;
+    margin-bottom: 1rem;
+    }
+
+    #kycTable td, #kycTable th {
+    padding: 0.6rem 1rem !important;
+    vertical-align: middle;
+    }
+
+    .dt-actions {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.25rem;
+    }
+
+    .btn-edit {
+    font-size: 0.85rem;
+    }
+</style>
+
+<div class="container-fluid px-3 mt-3">
+    <h2 class="mb-3 text-center mt-3">Retailer Available Services</h2>
+    @{
+        var success = TempData["sucsmsg"] as string;
+        var error = TempData["errmsg"] as string;
+       
+    }
+    <div class="mt-3 mb-3">
+        @if (!string.IsNullOrEmpty(success))
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle me-2"></i> @success
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+    
+        @if (!string.IsNullOrEmpty(error))
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle me-2"></i> @error
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+    </div>
+
+    <div class="table-responsive">
+        <table id="kycTable" class="table table-sm table-bordered align-middle" style="width:100%">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>User Name</th>
+                    <th>DMT</th>
+                    <th>CC Bill</th>
+                    <th>CC Bill BBPS</th>
+                    <th>Recharge</th>
+                    <th>DTH</th>
+                    <th>Electricity</th>
+                    <th>Water</th>
+                    <th>Insurance</th>
+                    <th>Bank</th>
+                    <th>Indo-Nepal</th>
+                    <th>Travel</th>
+                    <th>POS</th>
+                    <th>CMS</th>
+                    <th>Loans</th>
+                    <th>AEPS</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            const token = $('input[name="__RequestVerificationToken"]').val();
+
+            function renderStatus(data, type) {
+                if (type === 'display') {
+                    return data
+                        ? '<span class="text-success fw-bold"><i class="bx bx-check-circle"></i></span>'
+                        : '<span class="text-danger fw-bold"><i class="bx bx-x-circle"></i></span>';
+                }
+                return data;
+            }
+
+            $('#kycTable').DataTable({
+                "ajax": {
+                    "url": "/Admin/Useravailableservices/RetailerListJson",
+                    "type": "POST",
+                    "datatype": "json",
+                    "headers": {
+                        "RequestVerificationToken": token
+                    },
+                    "dataSrc": function (json) {
+                        return json.data;
+                    },
+                    "error": function (xhr) {
+                        console.error("❌ AJAX error:", xhr.responseText);
+                    }
+                },
+                "columns": [
+                    {
+                        "data": null,
+                        "render": function (data, type, row, meta) {
+                            return meta.row + 1;
+                        },
+                        "orderable": false
+                    },
+                    { "data": "userName" },
+                    { "data": "dmtService", "render": renderStatus },
+                    { "data": "creditCardBill", "render": renderStatus },
+                    { "data": "creditCardBbps", "render": renderStatus },
+                    { "data": "rechargeService", "render": renderStatus },
+                    { "data": "dthService", "render": renderStatus },
+                    { "data": "electricityBillService", "render": renderStatus },
+                    { "data": "waterBillService", "render": renderStatus },
+                    { "data": "insuranceService", "render": renderStatus },
+                    { "data": "moveToBankService", "render": renderStatus },
+                    { "data": "indoNepalService", "render": renderStatus },
+                    { "data": "travelBookingService", "render": renderStatus },
+                    { "data": "posService", "render": renderStatus },
+                    { "data": "cmsService", "render": renderStatus },
+                    { "data": "loansAndCreditCardService", "render": renderStatus },
+                    { "data": "aepsService", "render": renderStatus },
+                    {
+                        "data": "applicationUserId",
+                        "render": function (Userid, type, row) {
+                            return `<div class="dt-actions">
+                                        <a href="/Admin/Useravailableservices/ModifyServices?userId=${Userid}" class="btn btn-outline-primary btn-sm">
+                                            <i class="bx bx-edit-alt"></i> Change
+                                        </a>
+                                    </div>`;
+                        },
+                        "orderable": false
+                    }
+                ],
+                "language": {
+                    "emptyTable": "No retailer services available."
+                },
+                "responsive": true
+            });
+        });
+    </script>
+}

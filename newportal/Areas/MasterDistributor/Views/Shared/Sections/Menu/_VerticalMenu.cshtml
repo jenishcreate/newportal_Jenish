@@ -1,0 +1,124 @@
+@{
+    // TempData.Keep()
+    var currentPath = ViewContext.HttpContext.Request.Path.Value?.ToLower() ?? "";
+
+    bool IsActive(string url) => currentPath.StartsWith(url.ToLower());
+
+    string ActiveClass(string url, string type = "parent") => IsActive(url)
+        ? (type == "parent" ? "active open" : "active")
+        : "";
+}
+<style>
+    .menu-link.active {
+        color: #696CFF !important;
+        font-weight: 600;
+    }
+
+    .menu-item.active.open > .menu-link {
+        background-color: #f5f5ff;
+    }
+
+    .menu-sub .menu-link.active {
+        color: #a0a3ff !important;
+        font-weight: 700;
+        background-color: #f1f1ff;
+        
+    }
+</style>
+
+<aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+    <div class="app-brand demo @(Convert.ToBoolean(ViewData["navbarFull"]) ? "d-xl-none" : "")">
+        <a asp-area="MasterDistributor" asp-controller="Dashboard" asp-action="Index" class="app-brand-link">
+            <span class="app-brand-logo demo">@await Html.PartialAsync("../_Partials/_Macros")</span>
+            <span class="app-brand-text demo menu-text fw-bold ms-2">@TempData.Peek("appName")</span>
+        </a>
+        <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
+            <i class="bx bx-chevron-left bx-sm d-flex align-items-center justify-content-center"></i>
+        </a>
+    </div>
+
+    <div class="menu-inner-shadow"></div>
+    <ul class="menu-inner py-1">
+
+        <!-- Dashboard -->
+        <li class="menu-item @(ActiveClass("/MasterDistributor/Dashboard/Index"))">
+            <a asp-area="MasterDistributor" asp-controller="Dashboard" asp-action="Index" class="menu-link @(ActiveClass("/MasterDistributor/Dashboard/Index"))">
+                <i class="menu-icon tf-icons bx bx-home-smile"></i>
+                <div>Dashboard</div>
+            </a>
+        </li>
+
+
+        <!-- Reports -->
+        <li class="menu-item @(ActiveClass("/MasterDistributor/Report/WalletTransacctions"))">
+            <a href="javascript:void(0);" class="menu-link menu-toggle @(ActiveClass("/MasterDistributor/Report/WalletTransacctions"))">
+                <i class="menu-icon tf-icons bx bxs-report"></i>
+                <div>Reports </div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item @(IsActive("/MasterDistributor/Report/WalletTransacctions") ? "active" : "")">
+                    <a asp-area="MasterDistributor" asp-controller="Report" asp-action="WalletTransacctions" class="menu-link @(ActiveClass("/MasterDistributor/Report/WalletTransacctions", "sub"))">
+                        <div>All Wallet Transactions</div>
+                    </a>
+                </li>
+                
+            </ul>
+        </li>
+
+
+       
+
+        <!-- Distributor -->
+        <li class="menu-item @(ActiveClass("/MasterDistributor/addagent/adddistributor")) @(ActiveClass("/MasterDistributor/list/listdistributor"))@(ActiveClass("/MasterDistributor/Wallet/Distributor"))@(ActiveClass("/MasterDistributor/Wallet/Credit"))">
+            <a href="javascript:void(0);" class="menu-link menu-toggle @(ActiveClass("/MasterDistributor/addagent/adddistributor"))">
+                <i class="menu-icon tf-icons bx bx-user"></i>
+                <div>Distributor</div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item @(IsActive("/MasterDistributor/addagent/adddistributor") ? "active" : "")">
+                    <a asp-area="MasterDistributor" asp-controller="AddAgent" asp-action="AddDistributor" class="menu-link @(ActiveClass("/MasterDistributor/addagent/adddistributor", "sub"))">
+                        <div>Add Distributor</div>
+                    </a>
+                </li>
+                <li class="menu-item @(IsActive("/MasterDistributor/list/listdistributor") ? "active" : "")">
+                    <a asp-area="MasterDistributor" asp-controller="List" asp-action="ListDistributor" class="menu-link @(ActiveClass("/MasterDistributor/list/listdistributor", "sub"))">
+                        <div>List Distributor</div>
+                    </a>
+                </li>
+                <li class="menu-item @(IsActive("/MasterDistributor/Wallet/Distributor") ? "active" : "")">
+                    <a asp-area="MasterDistributor" asp-controller="Wallet" asp-action="Distributor" class="menu-link @(ActiveClass("/MasterDistributor/Wallet/Distributor", "sub"))">
+                        <div>Manage Wallet</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
+
+        <!-- Retailer -->
+        <li class="menu-item @(ActiveClass("/MasterDistributor/addagent/addretailer")) @(ActiveClass("/MasterDistributor/list/listretailer")) @(ActiveClass("/MasterDistributor/Wallet/listretailer")) @(ActiveClass("/MasterDistributor/Wallet/RetailerList"))">
+            <a href="javascript:void(0);" class="menu-link menu-toggle @(ActiveClass("/MasterDistributor/addagent/addretailer"))">
+                <i class="menu-icon tf-icons bx bx-store-alt"></i>
+                <div>Retailer</div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item @(IsActive("/MasterDistributor/addagent/addretailer") ? "active" : "")">
+                    <a asp-area="MasterDistributor" asp-controller="AddAgent" asp-action="AddRetailer" class="menu-link @(ActiveClass("/MasterDistributor/addagent/addretailer", "sub"))">
+                        <div>Add Retailer</div>
+                    </a>
+                </li>
+                <li class="menu-item @(IsActive("/MasterDistributor/list/listretailer") ? "active" : "")">
+                    <a asp-area="MasterDistributor" asp-controller="List" asp-action="ListRetailer" class="menu-link @(ActiveClass("/MasterDistributor/list/listretailer", "sub"))">
+                        <div>List Retailer</div>
+                    </a>
+                </li>
+                <li class="menu-item @(IsActive("/MasterDistributor/Wallet/RetailerList") ? "active" : "")">
+                    <a asp-area="MasterDistributor" asp-controller="Wallet" asp-action="RetailerList" class="menu-link @(ActiveClass("/MasterDistributor/Wallet/RetailerList", "sub"))">
+                        <div>Manage Wallet</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
+
+
+       
+    </ul>
+</aside>

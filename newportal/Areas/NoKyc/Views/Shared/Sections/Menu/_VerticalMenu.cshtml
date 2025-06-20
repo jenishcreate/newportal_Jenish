@@ -1,0 +1,63 @@
+
+@{
+  // TempData.Keep()
+  string? currentPage = ViewContext.HttpContext.Request.Path;
+}
+
+<!-- Menu -->
+@* ! Do this simple *@
+<aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+
+  @* ! Hide app brand if navbar-full *@
+  <div
+    class='app-brand demo @((@ViewData["navbarFull"] != null && Convert.ToBoolean(@ViewData["navbarFull"])) ? "d-xl-none" : "")'>
+        <a asp-area="NoKyc" asp-controller="Kyc" asp-action="KycSubmited" class="app-brand-link">
+      <span class="app-brand-logo demo">
+        @await Html.PartialAsync("../_Partials/_Macros")
+      </span>
+      <span class="app-brand-text demo menu-text fw-bold ms-2">@TempData.Peek("appName")</span>
+    </a>
+
+    <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
+      <i class="bx bx-chevron-left bx-sm d-flex align-items-center justify-content-center"></i>
+    </a>
+  </div>
+
+  <div class="menu-inner-shadow"></div>
+
+  @* ! Full version menu-items *@
+  <ul class="menu-inner py-1">
+    <!-- Dashboards -->
+
+
+        <li class='menu-item@(currentPage.EndsWith("/") || currentPage.StartsWith("/NoKyc/Kyc/KycSubmited") ? " active open" : "")'>
+      <a  href="javascript:void(0);" class="menu-link ">
+        <i class="menu-icon tf-icons bx bx-home-smile"></i>
+        <div class="text-truncate" data-i18n="Dashboards">Dashboards</div>
+        
+
+
+      </a>
+     
+    </li>
+
+
+    <div class="mx-10 mt-5 btn btn-sm btn-outline-danger">
+
+ 
+            <li class='menu-item@(currentPage == "/LayoutExamples/WithoutMenu" ? " active" : "")'>
+                <form asp-controller="Home" asp-action="Logout" method="post" id="logoutForm">
+                    <button type="submit" class="dropdown-item">
+                        <i class="bx bx-log-out-circle me-2"></i> Logout
+                    </button>
+                </form>
+            </li>
+    </div>
+    
+       
+        
+<ul/>
+    <!-- Layouts -->
+    
+</aside>
+<!-- / Menu -->

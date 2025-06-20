@@ -1,0 +1,448 @@
+﻿@model UserData_VM
+
+@{
+    ViewData["Title"] = "User Kyc";
+    ViewData["isNavbar"] = (ViewData["isNavbar"] ??= false);
+    ViewData["isMenu"] = (ViewData["isMenu"] ??= false);
+}
+
+<div class="container-fluid px-4 w-100">
+    <div class="card">
+        <div class="card-header">
+            <h4>KYC Verification</h4>
+        </div>
+
+        <div class="card-body">
+            <!-- STEP NAVIGATION TRACKER -->
+            <div class="d-flex justify-content-between mb-4">
+                @for (int i = 1; i <= 5; i++)
+                {
+                    var stepName = i switch
+                    {
+                        1 => "Aadhaar Verify",
+                        2 => "Pan Verify",
+                        3 => "Business Address Information",
+                        4 => "Basic Information",
+                        5 => "Contact Information",
+                        _ => "Step"
+                    };
+
+                  
+                }
+            </div>
+
+            <!-- FORM START -->
+            <form asp-area="NoKyc" asp-action="VerifyKyc" asp-controller="Kyc" method="post" enctype="multipart/form-data" id="kycForm">
+                 <div id="stepForm" >
+                    <input asp-for="UserData.UserDataId" class="form-control" value=" @ViewBag.id" hidden />
+                     <!-- Step 1: Aadhaar Upload -->
+                     <div class="step-section" id="step1">
+                        <h4 class="mb-3">Step 1: Aadhaar Verification</h4>
+
+                        <div class="row">
+                            <div class="mb-4 col-md-6">
+                                <label class="form-label">Aadhaar Front Image</label>
+                                <input type="file" name="AadhaarFront" class="form-control" required accept=".jpg,.png,.webp" />
+                            </div>
+                            <div class="mb-4 col-md-6">
+                                <label class="form-label">Aadhaar Back Image</label>
+                                <input type="file" name="AadhaarBack" class="form-control" required accept=".jpg,.png,.webp" />
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="mb-4 col-md-6">                               
+                                <label class="form-label">Aadhaar No.</label>
+                                <input asp-for="UserData.Adhar_No"   class="form-control" required />
+                                <button type="button" id="sendotp" class="btn btn-primary btn-sm mt-2" id="nextBtn">Send Otp</button>
+                            </div>
+                           
+                            <div class="mb-4 col-md-6">
+                                <label class="form-label">Aadhaar OTP</label>
+                                <input id="adharotp" name="AdharOtp" class="form-control" required />
+                                <button type="button" id="verifyotp" class="btn btn-primary btn-sm mt-2" id="nextBtn">Verify Otp</button>
+                            </div>
+                    
+
+                        </div>
+
+                        
+                    </div>
+
+                    <!-- Step 2: PAN Verification -->
+                    <div class="step-section d-none" id="step2">
+                        <h4 class="mb-3">Step 2: PAN Verification</h4>
+
+                        <div class="mb-4">
+                            <label class="form-label">Upload PAN Card Image</label>
+                            <input type="file" name="PanImage" class="form-control" required accept=".jpg,.png,.webp" />
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">PAN Number</label>
+                            <input asp-for="UserData.Pan_No" class="form-control" placeholder="Enter PAN Number" required />
+                            <span asp-validation-for="UserData.Pan_No" class="text-danger"></span>
+                        </div>
+                        
+                    </div>
+
+                    <!-- Step 3: Business Address -->
+                    <div class="step-section d-none" id="step3">
+                        <h4 class="mb-3">Step 3: Business Address Information</h4>
+                     
+                        <div class="mb-4">
+                            <label class="form-label">Company Address</label>
+                            <input asp-for="UserData.Address" class="form-control" placeholder="Enter Address" required />
+                        </div>
+                        <div class="row">
+                            <div class="mb-4 col-md-3">
+                                <label class="form-label">City</label>
+                                <input asp-for="UserData.City" class="form-control" required />
+                            </div>
+                            <div class="mb-4 col-md-3">
+                                <label class="form-label">State</label>
+                                <input asp-for="UserData.State" class="form-control" required />
+                            </div>
+                            <div class="mb-4 col-md-3">
+                                <label class="form-label">Country</label>
+                                <input asp-for="UserData.Country" class="form-control" required />
+                            </div>
+                            <div class="mb-4 col-md-3">
+                                <label class="form-label">Pin Code</label>
+                                <input asp-for="UserData.PinCode" class="form-control" required />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Basic Info -->
+                    <div class="step-section d-none" id="step4">
+                        <h4 class="mb-3">Step 4: Basic Information</h4>
+                        <div class="row">
+                            <div class="mb-4">
+                                <label class="form-label">Upload Profile Picture</label>
+                                <input type="file" asp-for="ProfilePicture" name="ProfilePicture" class="form-control" required accept=".jpg,.png,.webp" />
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label">Upload Blank Cheque Image</label>
+                                <input type="file" asp-for="Blankcheque" name="Blankcheque" class="form-control" required accept=".jpg,.png,.webp" />
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label">GST No</label>
+                                <input asp-for="UserData.GST_NO" class="form-control" placeholder="Enter GST Number"  />
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label">Udhyam No</label>
+                                <input asp-for="UserData.Udhyam_Adhar_NO" class="form-control" placeholder="Enter Udhyam Number"  />
+                            </div>
+
+                            <div class="mb-4 col-md-4">
+                                <label class="form-label">First Name</label>
+                                <input asp-for="UserData.FirstName" class="form-control" required />
+                            </div>
+                            <div class="mb-4 col-md-4">
+                                <label class="form-label">Middle Name</label>
+                                <input asp-for="UserData.MiddleName" class="form-control" />
+                            </div>
+                            <div class="mb-4 col-md-4">
+                                <label class="form-label">Last Name</label>
+                                <input asp-for="UserData.LastName" class="form-control" required />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="mb-4 col-md-6">
+                                <label class="form-label">Date of Birth</label>
+                                <input asp-for="UserData.DOB" type="date" class="form-control" required />
+                            </div>
+                            <div class="mb-4 col-md-6">
+                                <label class="form-label">Gender</label>
+                                <select asp-for="UserData.Gender" class="form-control" required>
+                                    <option value="">Select Gender</option>
+                                    <option>Male</option>
+                                    <option>Female</option>
+                                    <option>Other</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>  
+                    <!-- Step 5: Contact Info -->
+                    <div class="step-section d-none" id="step5">
+                        <h4 class="mb-3">Step 5: Contact Information</h4>
+                        
+                        <div class="mb-4">
+
+
+                            <div class="row">
+                                <div class="mb-4 col-md-6">
+                                    <label class="form-label">Email Address</label>
+                                    <input type="email" asp-for="AppUser.Email" value="@ViewBag.email" id="email" class="form-control text-black " readonly />
+                                    <button type="button" id="sendEmailotp" class="btn btn-primary btn-sm mt-2" >Send Otp</button>
+                                </div>
+
+                                <div class="mb-4 col-md-6">
+                                    <label class="form-label">Email Otp</label>
+                                    <input type="number" id="verifyemailotp"  class="form-control" required />
+                                <button type="button" id="verifyemailotpbtn" class="btn btn-primary btn-sm mt-2" >Verify Otp</button>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="mb-4 col-md-6">
+                                    <label class="form-label">Phone number</label>
+                                    <input asp-for="AppUser.PhoneNumber" id="phone" value="@ViewBag.mobile" class="form-control" readonly />
+                                    <button type="button" id="sendPhoneotp" class="btn btn-primary btn-sm mt-2" >Send Otp</button>
+                                </div>
+
+                                <div class="mb-4 col-md-6">
+                                <label class="form-label">Phone Otp</label>
+                                    <input type="number" id="MobileOtp" class="form-control" required />
+                                    <button type="button" id="verifyphoneotpbtn" class="btn btn-primary btn-sm mt-2">Verify Otp</button>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="mb-4 col-md-6">
+                                    <label class="form-label">WhatsApp number</label>
+                                    <input asp-for="AppUser.WhatsAppPhoneNumber" id="WhatsAppNo" value="@ViewBag.whatsAppNo"  class="form-control text-black " readonly  />
+                                    <button type="button" id="WhatsAppOtp" class="btn btn-primary btn-sm mt-2" >Send Otp</button>
+                                </div>
+
+                                <div class="mb-4 col-md-6">
+                                    <label class="form-label">WhatsApp Otp</label>
+                                    <input type="number" id="WhatsAppOtp" class="form-control" required />
+                                    <button type="button" id="WhatsAppOtpVerify" class="btn btn-primary btn-sm mt-2" >Verify Otp</button>
+                                </div>
+                            </div>
+
+
+                            
+
+
+
+                        </div>
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-lg btn-primary shadow ">Submit Kyc</button>
+                        </div>
+                    </div>
+
+                    <!-- Navigation -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="button" class="btn btn-secondary" id="prevBtn">Previous</button>
+                        <button type="button" class="btn btn-primary" id="nextBtn">Next</button>
+                    </div>
+
+                </div>
+            </form>
+         </div>
+    </div>
+</div>  
+
+<style>
+    .step-btn {
+        border-radius: 25px;
+        font-weight: 500;
+        margin-right: 5px;
+    }
+
+    .step-section {
+        display: none;
+    }
+
+        .step-section.active {
+            display: block;
+        }
+</style>
+
+<script>
+    let currentStep = 1;
+    const totalSteps = 5;
+    let completedSteps = [1];
+
+    const showStep = (step) => {
+        document.querySelectorAll('.step-section').forEach((el, i) => {
+            el.classList.toggle('active', i + 1 === step);
+            el.classList.toggle('d-none', i + 1 !== step);
+        });
+
+        for (let i = 1; i <= totalSteps; i++) {
+            const btn = document.getElementById('stepBtn' + i);
+            btn.classList.remove('btn-primary', 'btn-outline-secondary');
+            if (i === step) btn.classList.add('btn-primary');
+            else btn.classList.add('btn-outline-secondary');
+        }
+    };
+
+    const validateStep = (step) => {
+        let isValid = true;
+        const section = document.getElementById('step' + step);
+        const inputs = section.querySelectorAll('input, select');
+
+        inputs.forEach(input => {
+            if (input.hasAttribute('required') && !input.value.trim()) {
+                input.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                input.classList.remove('is-invalid');
+            }
+        });
+
+        return isValid;
+    };
+
+    document.getElementById("nextBtn").addEventListener("click", () => {
+        if (validateStep(currentStep)) {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                if (!completedSteps.includes(currentStep)) {
+                    completedSteps.push(currentStep);
+                }
+                showStep(currentStep);
+            }
+        }
+    });
+
+    document.getElementById("prevBtn").addEventListener("click", () => {
+        if (currentStep > 1) {
+            currentStep--;
+            showStep(currentStep);
+        }
+    });
+
+
+
+    showStep(currentStep);
+</script>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+            // Email OTP Send
+            $('#sendEmailotp').on('click', function () {
+                var email = $('#email').val().trim();
+
+                if (email === '') {
+                    alert("Please enter your email.");
+                    return;
+                }
+
+                console.log("Sending OTP to:", email);
+
+                $.ajax({
+                    url: '/NoKyc/Verification/Send',
+                    type: 'GET',
+                    data: { email: email },
+                    success: function (response) {
+                        alert("OTP sent to email.");
+                        console.log("Response:", response);
+                    },
+                    error: function (xhr, status, error) {
+                        alert("Failed to send OTP. Please try again.");
+                        console.error("Error:", error);
+                    }
+                });
+            });
+
+            // Email OTP Verify
+            $('#verifyemailotpbtn').on('click', function () {
+                var otp = $('#verifyemailotp').val().trim();
+
+                if (otp === '') {
+                    alert("Please enter the OTP.");
+                    return;
+                }
+
+                
+
+                $.ajax({
+                    url: '/NoKyc/Verification/Verify',
+                    type: 'POST',
+                    data: { otp: otp },
+                    success: function (response) {
+                        alert("OTP verified successfully.");
+                        $('#verifyemailotp').prop('readonly', true);
+                        $('#email').prop('readonly', true);
+                        $('#sendEmailotp').prop('disabled', true);
+                        $('#verifyemailotpbtn')
+                            .addClass('btn-success')
+                            .removeClass('btn-primary')
+                            .text("Verified");
+                    },
+                    error: function (xhr) {
+                        alert("OTP verification failed, Please Enter Valid Otp");
+                        
+                    }
+                });
+            });
+
+            //mobile otp ------------\/
+
+            $('#sendPhoneotp').on('click', function () {
+                var phone = $('#phone').val().trim();
+
+                if (phone === '') {
+                    alert("Please enter your Number.");
+                    return;
+                }
+
+                console.log("Sending OTP to:", phone);
+
+                $.ajax({
+                    url: '/NoKyc/Verification/SendOtp',
+                    type: 'GET',
+                    data: { phone: phone },
+                    success: function (response) {
+                        alert("OTP sent to number.");
+                        console.log("Response:", response);
+                    },
+                    error: function (xhr, status, error) {
+                        alert("Failed to send OTP. Please try again.");
+                        console.error("Error:", error);
+                    }
+                });
+            });
+
+            // phone OTP Verify
+
+                  $('#verifyphoneotpbtn').on('click', function () {
+            var phone = $('#phone').val().trim();
+            var otp = $('#MobileOtp').val().trim();
+
+            if (otp === '' || phone === '') {
+                alert("Please enter phone and OTP.");
+                return;
+            }
+
+            $.ajax({
+                url: '/NoKyc/Verification/VerifyOtp',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    phone: "+91" + phone,
+                    otp: otp
+                }),
+                success: function (response) {
+                    alert("OTP verified successfully.");
+                    $('#verifyphoneotpbtn').prop('readonly', true);
+                    $('#phone').prop('readonly', true);
+                    $('#sendPhoneotp').prop('disabled', true);
+                    $('#verifyphoneotpbtn')
+                        .addClass('btn-success')
+                        .removeClass('btn-primary')
+                        .text("Verified");
+                },
+                error: function (xhr) {
+                    alert("OTP verification failed.");
+                    console.error("Error:", xhr.responseText);
+                }
+            });
+        });
+
+        });
+    </script>
+}

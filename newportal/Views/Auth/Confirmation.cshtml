@@ -1,0 +1,35 @@
+﻿@{
+    ViewData["Title"] = "Password Reset Successful";
+}
+
+@section PageStyles {
+    <link rel="stylesheet" href="~/vendor/css/pages/page-auth.css" />
+}
+
+<div class="container-xxl">
+    <div class="authentication-wrapper authentication-basic container-p-y">
+        <div class="authentication-inner">
+            <div class="card px-sm-6 px-0">
+                <div class="card-body text-center">
+
+                    <div class="app-brand justify-content-center mb-4">
+                        <a href="/" class="app-brand-link gap-2">
+                            <span class="app-brand-logo demo">@await Html.PartialAsync("../_Partials/_Macros")</span>
+                            <span class="app-brand-text demo text-heading fw-bold">@TempData.Peek("appName")</span>
+                        </a>
+                    </div>
+
+                    <h4 class="mb-2 text-success">Password Reset Successful</h4>
+                    <p class="mb-4">Your password has been reset. You may now log in with your new credentials.</p>
+
+                    <a href="/Auth/Login" class="btn btn-primary d-grid w-100">Go to Login</a>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

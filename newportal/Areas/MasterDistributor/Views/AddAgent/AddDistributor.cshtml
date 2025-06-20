@@ -1,0 +1,67 @@
+﻿@model UserNameAndCompanyVM
+
+@{
+    ViewData["Title"] = "Register User";
+
+}
+
+<div class="container-fluid px-4 mt-5">
+    <div class="card">
+        <div class="card-header d-flex align-items-center justify-content-between">
+            <h5 class="mb-0">Register User</h5>
+            <small class="text-muted float-end">Please fill all required fields</small>
+        </div>
+        <div class="card-body">
+            <form asp-area="MasterDistributor" asp-action="AddDistributor" asp-controller="AddAgent" method="post">
+                <div class="row">
+                 
+                    <div class="mb-4 col-md-6">
+                        <label class="form-label">Email</label>
+                        <input asp-for="app.Email" type="email" class="form-control" placeholder="Enter Email" />
+                        <span asp-validation-for="app.Email" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="mb-4 col-md-6">
+                        <label class="form-label">Phone Number</label>
+                        <input asp-for="app.PhoneNumber" class="form-control" placeholder="Enter Phone Number" />
+                        <span asp-validation-for="app.PhoneNumber" class="text-danger"></span>
+                    </div>
+                    <div class="mb-4 col-md-6">
+                        <label class="form-label">WhatsApp Number</label>
+                        <input asp-for="app.WhatsAppPhoneNumber" class="form-control" placeholder="Enter WhatsApp Number" />
+                        <span asp-validation-for="app.WhatsAppPhoneNumber" class="text-danger"></span>
+                    </div>
+
+                    
+                </div>
+
+                <div class="row">
+                    <div class="mb-4 col-md-6">
+                        <label class="form-label">Company Name</label>
+                        <input asp-for="app.Firm_Name" class="form-control" placeholder="Enter Company Name" />
+                        <span asp-validation-for="app.Firm_Name" class="text-danger"></span>
+                    </div>
+                    <div class="mb-4 col-md-6">
+                        <label class="form-label">TPIN</label>
+                        <input asp-for="app.TPIN" class="form-control" placeholder="Enter TPIN" />
+                        <span asp-validation-for="app.TPIN" class="text-danger"></span>
+                    </div>
+
+                </div>
+
+
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-lg btn-primary px-5 py-2 shadow ">
+                        <i class="bi bi-person-plus-fill me-2"></i> Register
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

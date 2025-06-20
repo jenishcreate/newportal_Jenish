@@ -1,0 +1,210 @@
+﻿@{
+    ViewData["Title"] = "Wallet Transaction List";
+}
+<form id="csrfForm">@Html.AntiForgeryToken()</form>
+
+<style>
+    #retailerTable thead th {
+        border-bottom: 2px solid #616161 !important;
+        color: #212121;
+        font-weight: 700;
+        font-size: 13px;
+        text-transform: uppercase;
+    }
+
+    #retailerTable td {
+        background-color: #ffffff;
+        vertical-align: middle;
+        font-size: 15px;
+        color: #212121;
+    }
+
+        #retailerTable td:first-child {
+            font-weight: 600;
+            text-align: center;
+        }
+
+    div.dataTables_filter {
+        margin-top: 0.75rem;
+        margin-bottom: 1rem;
+    }
+
+    #retailerTable td, #retailerTable th {
+        padding: 0.6rem 1rem !important;
+        vertical-align: middle;
+    }
+
+    .dt-actions {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 0.25rem;
+    }
+
+    .highlight-text {
+        color: #0d47a1;
+        font-weight: 600;
+    }
+
+    #loadingIndicator .spinner-border {
+        width: 3rem;
+        height: 3rem;
+    }
+</style>
+
+<div class="container-fluid px-3 mt-3">
+    <h2 class="mb-3 text-center mt-3">All Wallet Transactions</h2>
+
+    <!-- 📅 Date Range Filter -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <label for="startDate" class="form-label highlight-text">Start Date:</label>
+            <input type="date" id="startDate" class="form-control" />
+        </div>
+        <div class="col-md-3">
+            <label for="endDate" class="form-label highlight-text">End Date:</label>
+            <input type="date" id="endDate" class="form-control" />
+        </div>
+        <div class="col-md-3 d-flex align-items-end">
+            <button id="loadBtn" class="btn btn-primary w-100">Submit</button>
+        </div>
+    </div>
+
+
+
+    <div class="row d-flex mb-3">
+        <span class="highlight-text">Please select a date range</span>
+    </div>
+    <!-- 🔄 Loading Indicator -->
+    <div id="loadingIndicator" class="text-center mb-3" style="display:none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2 highlight-text">Loading transactions...</p>
+    </div>
+    <div class="table-responsive">
+        <table id="retailerTable" class="table table-sm table-bordered align-middle" style="width:100%">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>FromUserId</th>
+                    <th>ToUserId</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Amount</th>
+                    <th>Linked Service TransactionId</th>
+                    <th>TransactionType</th>
+                    <th>InitiatedByUserId</th>
+                    <th>Remarks</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <script>
+        let dataTable;
+        let token;
+
+        $(document).ready(function () {
+            token = $('input[name="__RequestVerificationToken"]').val();
+
+            // Set default date as today
+            const today = new Date().toISOString().split('T')[0];
+            $('#startDate').val(today);
+            $('#endDate').val(today);
+
+            // Initialize DataTable
+            dataTable = $('#retailerTable').DataTable({
+                "ajax": {
+                   "url": "/MasterDistributor/Report/WalletTransacctionsJson",
+                    "type": "POST",
+                    "datatype": "json",
+                    "headers": {
+                        "RequestVerificationToken": token
+                    },
+                    "data": function (d) {
+                        d.startDate = $('#startDate').val();
+                        d.endDate = $('#endDate').val();
+                    },
+                    "dataSrc": function (json) {
+                        return json.data;
+                    },
+                    "error": function (xhr) {
+                        console.error("❌ AJAX error:", xhr.responseText);
+                    }
+                },
+                "columns": [
+                    {
+                        "data": null,
+                        "render": function (data, type, row, meta) {
+                            return meta.row + 1;
+                        },
+                        "orderable": false
+                    },
+                    { "data": "fromUserId" },
+                    { "data": "toUserId" },
+                    {
+                        "data": "date",
+                        "render": function (data) {
+                            return data ? new Date(data).toLocaleDateString() : '';
+                        }
+                    },
+                    {
+                        "data": "date",
+                        "render": function (data) {
+                            return data ? new Date(data).toLocaleTimeString() : '';
+                        }
+                    },
+                    { "data": "amount" },
+                    { "data": "linkedServiceTransactionId" },
+                    {
+                        "data": "transactionType",
+                        "render": function (data) {
+                            switch (data) {
+                                case 0:
+                                case "Credit":
+                                    return '<span class="badge bg-success">Credited To User Wallet</span>';
+                                case 1:
+                                case "Debit":
+                                    return '<span class="badge bg-danger">Debited User Wallet</span>';
+                                case "PeerTransfer":
+                                    return '<span class="badge bg-info">Peer To Peer Transfer</span>';
+                                default:
+                                    return '<span class="badge bg-secondary">Unknown</span>';
+                            }
+                        }
+                    },
+                    { "data": "initiatedByUserId" },
+                    { "data": "remarks" }
+                ],
+                "language": {
+                    "emptyTable": "No transactions available in selected range."
+                },
+                "responsive": true,
+                "drawCallback": function () {
+                    $('#loadingIndicator').hide(); // Hide loader after data loads
+                }
+            });
+
+            // Handle submit click
+            $('#loadBtn').on('click', function () {
+                const startDate = $('#startDate').val();
+                const endDate = $('#endDate').val();
+
+                if (!startDate || !endDate) {
+                    alert("Please select both start and end dates.");
+                    return;
+                }
+
+                $('#loadingIndicator').show(); // Show loader
+                dataTable.ajax.reload(null, false); // Reload DataTable
+            });
+        });
+    </script>
+}

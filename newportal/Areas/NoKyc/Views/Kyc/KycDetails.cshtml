@@ -1,0 +1,194 @@
+﻿@model newportal.Models.UserData
+
+<div class="container-fluid px-4 w-100">
+    <div class="card mt-4 shadow">
+        <div class="card-header d-flex align-items-center bg-light border-bottom">
+            
+            <h2 class="mb-0 text-center">KYC Details</h2>
+            
+        </div>
+
+        
+        <div class="card-body mt-4">
+            <a asp-area="NoKyc" asp-controller="Kyc" asp-action="KycSubmited" class="btn btn-outline-secondary mb-5"> Back to Home</a>
+            <hr />
+           
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">First Name:</label>
+                    <div>@Model.FirstName</div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Middle Name:</label>
+                    <div>@Model.MiddleName</div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Last Name:</label>
+                    <div>@Model.LastName</div>
+                </div>
+            </div>
+            <br />
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Date of Birth:</label>
+                    <div>@Model.DOB</div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Gender:</label>
+                    <div>@Model.Gender</div>
+                </div>
+            </div>
+            <br />
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Aadhaar Number:</label>
+                    <div>@Model.Adhar_No</div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">PAN Number:</label>
+                    <div>@Model.Pan_No</div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Company Name:</label>
+                    <div>@Model.Companyname</div>
+                </div>
+            </div>
+            <br />
+            <div class="row mb-3">
+                <div class="col-md-8">
+                    <label class="form-label fw-bold">Address:</label>
+                    <div>@Model.Address</div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">City:</label>
+                    <div>@Model.City</div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">State:</label>
+                    <div>@Model.State</div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Country:</label>
+                    <div>@Model.Country</div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Pin Code:</label>
+                    <div>@Model.PinCode</div>
+                </div>
+            </div>
+
+            <hr />
+
+            <h5 class="text-muted mt-4 mb-3">Uploaded Documents</h5>
+            <br />
+            <div class="row mb-3 text-center">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Profile Picture:</label>
+                    <div>
+                        @if (!string.IsNullOrEmpty(Model.ProfilePicture))
+                        {
+                            <img src="@Model.ProfilePicture" class="img-thumbnail popup-img" width="200" height="150" data-src="@Model.ProfilePicture" />
+                        }
+                        else
+                        {
+                            <span>No image</span>
+                        }
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Aadhaar Front:</label>
+                    <div>
+                        @if (!string.IsNullOrEmpty(Model.Adhar_Front_Photo_Url))
+                        {
+                            <img src="@Model.Adhar_Front_Photo_Url" class="img-thumbnail popup-img" width="200" height="150" data-src="@Model.Adhar_Front_Photo_Url" />
+                        }
+                        else
+                        {
+                            <span>No image</span>
+                        }
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Aadhaar Back:</label>
+                    <div>
+                        @if (!string.IsNullOrEmpty(Model.Adhar_Back_Photo_Url))
+                        {
+                            <img src="@Model.Adhar_Back_Photo_Url" class="img-thumbnail popup-img" width="200" height="150" data-src="@Model.Adhar_Back_Photo_Url" />
+                        }
+                        else
+                        {
+                            <span>No image</span>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3 text-center">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">PAN Image:</label>
+                    <div>
+                        @if (!string.IsNullOrEmpty(Model.Pan_Photo_Url))
+                        {
+                            <img src="@Model.Pan_Photo_Url" class="img-thumbnail popup-img" width="200" height="150" data-src="@Model.Pan_Photo_Url" />
+                        }
+                        else
+                        {
+                            <span>No image</span>
+                        }
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Cancelled Cheque Image:</label>
+                    <div>
+                        @if (!string.IsNullOrEmpty(Model.Blank_Check_Photo_Url))
+                        {
+                            <img src="@Model.Blank_Check_Photo_Url" class="img-thumbnail popup-img" width="200" height="150" data-src="@Model.Blank_Check_Photo_Url" />
+                        }
+                        else
+                        {
+                            <span>No image</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Image Preview Modal -->
+<div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-labelledby="imagePreviewLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-light">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-semibold text-dark" id="imagePreviewLabel">Image Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" class="img-fluid rounded shadow" style="max-height: 80vh;" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const modal = new bootstrap.Modal(document.getElementById("imagePreviewModal"));
+            const modalImg = document.getElementById("modalImage");
+
+            document.querySelectorAll(".popup-img").forEach(img => {
+                img.addEventListener("click", function () {
+                    const fullSrc = img.getAttribute("data-src");
+                    modalImg.src = fullSrc;
+                    modal.show();
+                });
+            });
+        });
+    </script>
+}

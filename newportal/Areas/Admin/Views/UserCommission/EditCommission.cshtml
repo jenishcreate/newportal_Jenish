@@ -1,0 +1,37 @@
+﻿@model newportal.Models.UserCommission
+
+@{
+    ViewData["Title"] = "Edit Commission";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center fw-bold mb-4">Edit Commission for <span class="text-primary">@Model.Username</span></h2>
+
+    <form asp-action="EditCommission" asp-area="Admin" asp-controller="UserCommission" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="UserCommissionId" />
+        <input type="hidden" asp-for="ApplicationUserId" />
+        <input type="hidden" asp-for="Username" />
+
+        <div class="row g-4">
+            @foreach (var prop in typeof(newportal.Models.UserCommission).GetProperties()
+            .Where(p => p.PropertyType == typeof(decimal) && p.Name != "UserCommissionId" && p.Name != "ApplicationUserId"))
+            {
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold fs-6">@prop.Name</label>
+                    <input name="@prop.Name" value="@Model.GetType().GetProperty(prop.Name).GetValue(Model)" class="form-control" step="0.001" />
+                    <span asp-validation-for="@prop.Name" class="text-danger"></span>
+                </div>
+            }
+        </div>
+
+        <div class="mt-4 d-flex justify-content-center">
+            <button type="submit" class="btn btn-success px-4 me-3">Save Changes</button>
+            <a asp-action="MasterDistributors" class="btn btn-secondary px-4">Cancel</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

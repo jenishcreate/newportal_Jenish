@@ -1,0 +1,239 @@
+﻿@{
+    ViewData["Title"] = "Master Distributors Wallet";
+}
+
+<form id="csrfForm">@Html.AntiForgeryToken()</form>
+
+<style>
+    #retailerTable thead th {
+        border-bottom: 2px solid #616161 !important;
+        color: #212121;
+        font-weight: 700;
+        font-size: 13px;
+        text-transform: uppercase;
+    }
+
+    #retailerTable td {
+        background-color: #ffffff;
+        vertical-align: middle;
+        font-size: 14px;
+        color: #212121;
+    }
+
+        #retailerTable td:first-child {
+            font-weight: 600;
+            text-align: center;
+        }
+
+    div.dataTables_filter {
+        margin-top: 0.75rem;
+        margin-bottom: 1rem;
+    }
+
+    #retailerTable td, #retailerTable th {
+        padding: 0.4rem 0.6rem !important;
+        vertical-align: middle;
+    }
+
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 40px;
+        height: 20px;
+    }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #dc3545;
+        transition: .4s;
+        border-radius: 20px;
+    }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+    input:checked + .slider {
+        background-color: #28a745;
+    }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+</style>
+
+<div class="container-fluid px-3 mt-3">
+    <h2 class="mb-3 text-center mt-3">Manage Master Distributor's Wallet</h2>
+
+    <div class="table-responsive">
+        <table id="retailerTable" class="table table-sm table-bordered align-middle" style="width:100%">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>User Id</th>
+                    <th>Company Name</th>
+                    <th>Wallet Actions</th>
+                    <th>Mobile No</th>
+                    <th>Email Id</th>
+                    <th>Wallet Balance</th>
+                    <th>LIen Balance</th>
+                    <th>Parent Id</th>
+                    <th>Join Date</th>
+                    <th>User Status</th>
+                    <th>Block/Unblock</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            const token = $('input[name="__RequestVerificationToken"]').val();
+
+            const table = $('#retailerTable').DataTable({
+                "ajax": {
+                    "url": "/Admin/Wallet/GetAllMasterDistributor",
+                    "type": "POST",
+                    "datatype": "json",
+                    "headers": {
+                        "RequestVerificationToken": token
+                    },
+                    "dataSrc": function (json) {
+                        return json.data;
+                    }
+                },
+                "columns": [
+                    {
+                        "data": null,
+                        "render": function (data, type, row, meta) {
+                            return meta.row + 1;
+                        }
+                    },
+                    { "data": "userName" },
+                    { "data": "companyName" },
+                    {
+                        "data": "userId",
+                        "render": function (data, type, row) {
+                            return `
+                                <div class="d-flex flex-column">
+                                    <a href="/Admin/Wallet/Credit?userId=${data}" class="btn btn-success btn-sm px-2 py-1 mb-1">Credit</a>
+                                    <a href="/Admin/Wallet/Debit?userId=${data}" class="btn btn-danger btn-sm px-2 py-1">Debit</a>
+                                </div>`;
+                        },
+                        "orderable": false
+                    },
+                    { "data": "mobileNo" },
+                    { "data": "emailId" },
+                    { "data": "walletBalance" },
+                    {
+                        "data": "blockedamount",
+                        "render": function (data, type, row) {
+                            return `₹ ${data}
+                                <br/>
+                                <button class="btn btn-warning btn-sm px-2 py-1 mt-1 block-btn" data-userid="${row.userId}">
+                                    Modify
+                                </button>`;
+                        }
+                    },
+                    { "data": "parentId" },
+                    {
+                        "data": "joinDate",
+                        "render": function (data) {
+                            return data ? new Date(data).toLocaleDateString() : '';
+                        }
+                    },
+                    {
+                        "data": "status",
+                        "render": function (data) {
+                            return data === 0 || data === "Active"
+                                ? '<span class="badge bg-success">Active</span>'
+                                : '<span class="badge bg-danger">Inactive</span>';
+                        }
+                    },
+                    {
+                        "data": "userId",
+                        "render": function (data, type, row) {
+                            const isChecked = row.walletstatus ? 'checked' : '';
+                            return `
+                                <label class="toggle-switch">
+                                    <input type="checkbox" class="wallet-toggle" data-userid="${data}" ${isChecked}>
+                                    <span class="slider"></span>
+                                </label>`;
+                        },
+                        "orderable": false
+                    }
+                ]
+            });
+
+            // Blocked Amount Update
+            $('#retailerTable').on('click', '.block-btn', function () {
+                const userId = $(this).data('userid');
+                const amount = prompt("Enter amount to block:");
+
+                if (amount && !isNaN(amount)) {
+                    $.ajax({
+                        url: '/Admin/Wallet/UpdateBlockedAmount',
+                        type: 'POST',
+                        headers: {
+                            'RequestVerificationToken': token
+                        },
+                        data: { userId, amount },
+                        success: function (res) {
+                            alert(res.message);
+                            table.ajax.reload();
+                        },
+                        error: function () {
+                            alert('Failed to block wallet amount.');
+                        }
+                    });
+                }
+            });
+
+            // Wallet Toggle (Block/Unblock)
+            $('#retailerTable').on('change', '.wallet-toggle', function () {
+                const userId = $(this).data('userid');
+
+                $.ajax({
+                    url: '/Admin/Wallet/ToggleWalletStatus',
+                    type: 'POST',
+                    headers: {
+                        'RequestVerificationToken': token
+                    },
+                    data: { userId },
+                    success: function (res) {
+                        alert(res.message);
+                        table.ajax.reload();
+                    },
+                    error: function () {
+                        alert('Failed to toggle wallet block status.');
+                    }
+                });
+            });
+        });
+    </script>
+}

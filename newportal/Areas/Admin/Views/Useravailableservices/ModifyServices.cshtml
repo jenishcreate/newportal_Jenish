@@ -1,0 +1,119 @@
+﻿@model newportal.Models.Useravailableservices
+
+@{
+    ViewData["Title"] = "Modify User Services";
+}
+
+<div class="container mt-5">
+    <div class="card shadow rounded">
+        <div class="card-header">
+            <h2 class="mb-0 text-primary">Modify Services for : <span class="fw-bold"> @Model.UserName</span></h2>
+        </div>
+        <div class="card-body">
+            <form asp-action="ModifyServices" asp-controller="Useravailableservices" asp-area="Admin" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="UseravailableservicesId" />
+                <input type="hidden" asp-for="ApplicationUserId" />
+                <input type="hidden" asp-for="UserName" />
+
+                <div class="row g-4">
+                    <!-- Column 1 -->
+                    <div class="col-md-4">
+                        <div class="form-check form-switch mb-4">
+                            <input asp-for="DmtService" class="form-check-input @(Model.DmtService ? "bg-success" : "bg-danger")" />
+                            <label asp-for="DmtService" class="form-check-label">DMT Service</label>
+                        </div>
+                        <div class="form-check form-switch mb-4">
+                            <input asp-for="CreditCardBill" class="form-check-input @(Model.CreditCardBill ? "bg-success" : "bg-danger")" />
+                            <label asp-for="CreditCardBill" class="form-check-label">Credit Card Bill</label>
+                        </div>
+                        <div class="form-check form-switch mb-4">
+                            <input asp-for="CreditCardBbps" class="form-check-input @(Model.CreditCardBbps ? "bg-success" : "bg-danger")" />
+                            <label asp-for="CreditCardBbps" class="form-check-label">Credit Card BBPS</label>
+                        </div>
+                        <div class="form-check form-switch mb-4">
+                            <input asp-for="RechargeService" class="form-check-input @(Model.RechargeService ? "bg-success" : "bg-danger")" />
+                            <label asp-for="RechargeService" class="form-check-label">Recharge Service</label>
+                        </div>
+                        <div class="form-check form-switch mb-4">
+                            <input asp-for="DthService" class="form-check-input @(Model.DthService ? "bg-success" : "bg-danger")" />
+                            <label asp-for="DthService" class="form-check-label">DTH Service</label>
+                        </div>
+                        <div class="form-check form-switch mb-4">
+                            <input asp-for="ElectricityBillService" class="form-check-input @(Model.ElectricityBillService ? "bg-success" : "bg-danger")" />
+                            <label asp-for="ElectricityBillService" class="form-check-label">Electricity Bill</label>
+                        </div>
+                    </div>
+
+                    <!-- Column 2 -->
+                    <div class="col-md-4">
+                        <div class="form-check form-switch mb-4">
+                            <input asp-for="WaterBillService" class="form-check-input @(Model.WaterBillService ? "bg-success" : "bg-danger")" />
+                            <label asp-for="WaterBillService" class="form-check-label">Water Bill</label>
+                        </div>
+                        <div class="form-check form-switch mb-4">
+                            <input asp-for="InsuranceService" class="form-check-input @(Model.InsuranceService ? "bg-success" : "bg-danger")" />
+                            <label asp-for="InsuranceService" class="form-check-label">Insurance Service</label>
+                        </div>
+                        <div class="form-check form-switch mb-4">
+                            <input asp-for="MoveToBankService" class="form-check-input @(Model.MoveToBankService ? "bg-success" : "bg-danger")" />
+                            <label asp-for="MoveToBankService" class="form-check-label">Move to Bank</label>
+                        </div>
+                        <div class="form-check form-switch mb-4">
+                            <input asp-for="IndoNepalService" class="form-check-input @(Model.IndoNepalService ? "bg-success" : "bg-danger")" />
+                            <label asp-for="IndoNepalService" class="form-check-label">Indo-Nepal Transfer</label>
+                        </div>
+                        <div class="form-check form-switch mb-4">
+                            <input asp-for="TravelBookingService" class="form-check-input @(Model.TravelBookingService ? "bg-success" : "bg-danger")" />
+                            <label asp-for="TravelBookingService" class="form-check-label">Travel Booking</label>
+                        </div>
+                        <div class="form-check form-switch mb-4">
+                            <input asp-for="PosService" class="form-check-input @(Model.PosService ? "bg-success" : "bg-danger")" />
+                            <label asp-for="PosService" class="form-check-label">POS Service</label>
+                        </div>
+                    </div>
+
+                    <!-- Column 3 -->
+                    <div class="col-md-4">
+                        <div class="form-check form-switch mb-4">
+                            <input asp-for="CmsService" class="form-check-input @(Model.CmsService ? "bg-success" : "bg-danger")" />
+                            <label asp-for="CmsService" class="form-check-label">CMS Service</label>
+                        </div>
+                        <div class="form-check form-switch mb-4">
+                            <input asp-for="LoansAndCreditCardService" class="form-check-input @(Model.LoansAndCreditCardService ? "bg-success" : "bg-danger")" />
+                            <label asp-for="LoansAndCreditCardService" class="form-check-label">Loans & Credit Card</label>
+                        </div>
+                        <div class="form-check form-switch mb-4">
+                            <input asp-for="AepsService" class="form-check-input @(Model.AepsService ? "bg-success" : "bg-danger")" />
+                            <label asp-for="AepsService" class="form-check-label">AEPS Service</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 d-flex justify-content-end">
+                    <a asp-action="RetailerList" class="btn btn-outline-secondary me-3">Cancel</a>
+                    <button type="submit" class="btn btn-success">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <script>
+        document.querySelectorAll('.form-check-input').forEach(input => {
+            function updateColor(el) {
+                el.classList.remove('bg-success', 'bg-danger');
+                el.classList.add(el.checked ? 'bg-success' : 'bg-danger');
+            }
+
+            updateColor(input);
+
+            input.addEventListener('change', function () {
+                updateColor(this);
+            });
+        });
+    </script>
+}

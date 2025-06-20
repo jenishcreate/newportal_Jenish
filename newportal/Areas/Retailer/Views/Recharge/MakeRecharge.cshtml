@@ -1,0 +1,580 @@
+﻿@model Recharge_VM
+@{
+    ViewData["Title"] = "Recharge";
+}
+
+<style>
+    .recharge-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 20px;
+        gap: 20px;
+        min-height: 100vh;
+        background: #f8f9fa;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .form-card, .offers-card {
+        background: #ffffff;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        padding: 30px;
+        animation: fadeIn 0.5s ease-in-out;
+        box-sizing: border-box;
+    }
+
+    .form-card {
+        width: 48%;
+        flex: 0 0 48%;
+    }
+
+    .offers-card {
+        width: 48%;
+        flex: 0 0 48%;
+        max-height: 700px;
+        overflow-y: auto;
+    }
+
+    .form-switcher {
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+        .form-switcher .btn {
+            border-radius: 25px;
+            padding: 10px 25px;
+            margin: 0 5px;
+            border: 2px solid #696CFF;
+            background: transparent;
+            color: #696CFF;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+            .form-switcher .btn.active {
+                background: #696CFF;
+                color: white;
+            }
+
+    .form-section {
+        display: none;
+    }
+
+        .form-section.active {
+            display: block;
+            animation: slideIn 0.4s ease-in-out;
+        }
+
+    .plan-item {
+        border: 1px solid #e9ecef;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: #fff;
+    }
+
+        .plan-item:hover {
+            border-color: #696CFF;
+            box-shadow: 0 2px 10px rgba(0,123,255,0.2);
+            transform: translateY(-2px);
+        }
+
+        .plan-item.selected {
+            border-color: #696CFF;
+            background: rgba(0,123,255,0.05);
+        }
+
+    .plan-price {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #696CFF;
+    }
+
+    .plan-validity {
+        color: #28a745;
+        font-weight: 600;
+    }
+
+    .plan-benefits {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-top: 5px;
+    }
+
+    .operator-tabs {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+
+    .operator-tab {
+        padding: 10px 16px;
+        border: 1px solid #dee2e6;
+        border-radius: 20px;
+        background: #f8f9fa;
+        color: #495057;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+        .operator-tab.active {
+            background: #696CFF;
+            color: white;
+            border-color: #696CFF;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,123,255,0.3);
+        }
+
+  
+    @@media (max-width: 968px) {
+        .recharge-container {
+            flex-direction: column;
+            padding: 15px;
+            gap: 20px;
+        }
+
+        .form-card, .offers-card {
+            width: 100%;
+            flex: none;
+        }
+
+        .offers-card {
+            max-height: 500px;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .recharge-container {
+            padding: 10px;
+        }
+
+        .form-card, .offers-card {
+            padding: 20px;
+        }
+
+        .operator-tabs {
+            justify-content: center;
+        }
+
+        .operator-tab {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+    }
+
+    .loader {
+        display: none;
+        text-align: center;
+        padding: 20px;
+    }
+</style>
+@{
+    var success = TempData["Success"] as string;
+    var info = TempData["Info"] as string;
+    var error = TempData["msg"] as string;
+}
+<div class="container">
+<div class="row">
+
+
+    <div class="mt-3 mb-3">
+        @if (!string.IsNullOrEmpty(success))
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle me-2"></i> @success
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(info))
+        {
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                <i class="bi bi-info-circle me-2"></i> @info
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(error))
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle me-2"></i> @error
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+    </div>
+</div>
+<div class="recharge-container">
+    <!-- Recharge Form Section -->
+    <div class="form-card">
+        <h4 class="mb-4 fw-bold text-primary text-center">Mobile Recharge</h4>
+
+        @if (!string.IsNullOrEmpty(Model?.ErrorMessage))
+        {
+            <div class="alert alert-danger">@Model.ErrorMessage</div>
+        }
+
+        <!-- Form Type Switcher -->
+        <div class="form-switcher">
+            <button type="button" class="btn active" id="prepaidBtn" onclick="switchForm('prepaid')"> Prepaid</button>
+            <button type="button" class="btn" id="postpaidBtn" onclick="switchForm('postpaid')">Postpaid</button>
+        </div>
+
+        <!-- Prepaid Form -->
+        <form asp-action="MakeRecharge" asp-controller="Recharge" asp-area="Retailer" method="post" id="prepaidForm" class="form-section active">
+            <input type="hidden" name="RechargeType" value="Prepaid" />
+
+            <div class="mb-3">
+                <label asp-for="Customer_MobileNumber" class="form-label">Mobile Number</label>
+                <input asp-for="Customer_MobileNumber" class="form-control" placeholder="Enter 10-digit mobile number" required />
+                <span asp-validation-for="Customer_MobileNumber" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Circle" class="form-label">Circle</label>
+                <select asp-for="Circle" class="form-select" required >
+                    <option value="">-- Select Circle --</option>
+                    <option value="Gujrat">Gujrat</option>
+                    <option value="Maharastra">Maharastra</option>
+                    <option value="Rajasthan">Rajasthan</option>
+                    <option value="Panjab">Panjab</option>
+                </select>
+                <span asp-validation-for="Circle" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="MobileNumber_operator" class="form-label">Operator</label>
+                <select asp-for="MobileNumber_operator" class="form-select" onchange="loadPlans(this.value, 'prepaid')">
+                    <option value="">-- Select Operator --</option>
+                    <option value="Jio">Jio</option>
+                    <option value="Airtel">Airtel</option>
+                    <option value="Vi">Vi</option>
+                    <option value="BSNL">BSNL</option>
+                </select>
+                <span asp-validation-for="MobileNumber_operator" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+
+                    <input  type="hidden" name="Latitude" id="Latitude" hidden/>
+                    <input name="Longitude" id="Longitude" hidden />
+            </div>
+       
+            <div class="mb-3">
+
+                <input asp-for="RechargeType" class="form-control" value="Prepaid" hidden />
+
+            </div>
+            <div class="mb-3">
+                <label asp-for="RechargeAmount" class="form-label">Recharge Amount</label>
+                <input asp-for="RechargeAmount" class="form-control" placeholder="Enter amount" id="prepaidAmount" required/>
+                <span asp-validation-for="RechargeAmount" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="Tpin" class="form-label">TPIN</label>
+                <input asp-for="Tpin" class="form-control" type="password" placeholder="Enter your TPIN" required />
+                <span asp-validation-for="Tpin" class="text-danger small"></span>
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-lg fw-semibold">Recharge Now</button>
+            </div>
+        </form>
+
+        <!-- Postpaid Form -->
+        <form asp-action="MakeRecharge" asp-controller="Recharge" asp-area="Retailer" method="post" id="postpaidForm" class="form-section">
+            <input type="hidden" name="RechargeType" value="Postpaid" />
+
+            <div class="mb-3">
+                <label asp-for="Customer_MobileNumber" class="form-label">Mobile Number</label>
+                <input asp-for="Customer_MobileNumber" class="form-control" placeholder="Enter 10-digit mobile number" />
+                <span asp-validation-for="Customer_MobileNumber" class="text-danger small"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Circle" class="form-label">Circle</label>
+                <select asp-for="Circle" class="form-select" required>
+                    <option value="">-- Select Circle --</option>
+                    <option value="Gujrat">Gujrat</option>
+                    <option value="Maharastra">Maharastra</option>
+                    <option value="Rajasthan">Rajasthan</option>
+                    <option value="Panjab">Panjab</option>
+                </select>
+                <span asp-validation-for="Circle" class="text-danger small"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="MobileNumber_operator" class="form-label">Operator</label>
+                <select asp-for="MobileNumber_operator" class="form-select" onchange="loadPlans(this.value, 'postpaid')">
+                    <option value="">-- Select Operator --</option>
+                    <option value="Jio">Jio</option>
+                    <option value="Airtel">Airtel</option>
+                    <option value="Vi">Vi</option>
+                    <option value="BSNL">BSNL</option>
+                </select>
+                <span asp-validation-for="MobileNumber_operator" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+              
+                <input asp-for="RechargeType" class="form-control" value="Postpaid" hidden />
+               
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="RechargeAmount" class="form-label">Bill Amount</label>
+                <input asp-for="RechargeAmount" class="form-control" placeholder="Enter bill amount" id="postpaidAmount" />
+                <span asp-validation-for="RechargeAmount" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="Tpin" class="form-label">TPIN</label>
+                <input asp-for="Tpin" class="form-control" type="password" placeholder="Enter your TPIN" />
+                <span asp-validation-for="Tpin" class="text-danger small"></span>
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-lg fw-semibold">Pay Bill</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Offers & Plans Section -->
+    <div class="offers-card">
+        <h5 class="mb-3 fw-bold text-success text-center">Available Plans & Offers</h5>
+
+        <div class="operator-tabs" id="operatorTabs">
+           
+            <div class="operator-tab" onclick="showOperatorPlans('Jio')">Jio</div>
+            <div class="operator-tab" onclick="showOperatorPlans('Airtel')">Airtel</div>
+            <div class="operator-tab" onclick="showOperatorPlans('Vi')">Vi</div>
+            <div class="operator-tab" onclick="showOperatorPlans('BSNL')">BSNL</div>
+        </div>
+
+        <div class="loader" id="plansLoader">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Loading plans...</p>
+        </div>
+
+        <div id="plansContainer">
+            <p class="text-muted text-center">Select an operator to view available plans</p>
+        </div>
+    </div>
+</div>
+</div>  
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        // Wait for page to load
+        window.onload = function () {
+            if (navigator.geolocation) {
+                       navigator.geolocation.getCurrentPosition(
+            function (position) {
+                document.getElementById("Latitude").value = position.coords.latitude;
+                document.getElementById("Longitude").value = position.coords.longitude;
+            },
+            function (error) {
+                alert("Location permission denied or unavailable. Recharge cannot proceed without your location.");
+                document.getElementById("rechargeForm").addEventListener("submit", function (e) {
+                    e.preventDefault();
+                });
+            },
+            {
+                enableHighAccuracy: true,  // 🔥 ask for GPS if available
+                timeout: 10000,
+                maximumAge: 0
+            }
+        );
+
+            } else {
+                // ❌ Browser doesn't support geolocation
+                alert("Your browser does not support location services. Please use a modern browser.");
+                document.getElementById("rechargeForm").addEventListener("submit", function (e) {
+                    e.preventDefault(); // Stop form from submitting
+                });
+            }
+        };
+    </script>
+    <script>
+        // Sample plans data (In real application, this would come from API)
+        const plansData = {
+            Jio: {
+                prepaid: [
+                    { price: 149, validity: "28 days", benefits: "1.5GB/day, Unlimited calls, 100 SMS/day", popular: true },
+                    { price: 239, validity: "28 days", benefits: "2GB/day, Unlimited calls, 100 SMS/day" },
+                    { price: 299, validity: "28 days", benefits: "2.5GB/day, Unlimited calls, 100 SMS/day" },
+                    { price: 479, validity: "56 days", benefits: "1.5GB/day, Unlimited calls, 100 SMS/day" },
+                    { price: 719, validity: "84 days", benefits: "1.5GB/day, Unlimited calls, 100 SMS/day" }
+                ],
+                postpaid: [
+                    { price: 399, validity: "Monthly", benefits: "75GB data, Unlimited calls, 100 SMS/day, Netflix" },
+                    { price: 599, validity: "Monthly", benefits: "100GB data, Unlimited calls, 100 SMS/day, Netflix + Prime" },
+                    { price: 799, validity: "Monthly", benefits: "150GB data, Unlimited calls, 100 SMS/day, All OTT" }
+                ]
+            },
+            Airtel: {
+                prepaid: [
+                    { price: 155, validity: "28 days", benefits: "1GB/day, Unlimited calls, 100 SMS/day", popular: true },
+                    { price: 265, validity: "28 days", benefits: "1.5GB/day, Unlimited calls, 100 SMS/day" },
+                    { price: 359, validity: "28 days", benefits: "2.5GB/day, Unlimited calls, 100 SMS/day" },
+                    { price: 509, validity: "56 days", benefits: "1.5GB/day, Unlimited calls, 100 SMS/day" },
+                    { price: 839, validity: "84 days", benefits: "2GB/day, Unlimited calls, 100 SMS/day" }
+                ],
+                postpaid: [
+                    { price: 499, validity: "Monthly", benefits: "75GB data, Unlimited calls, Wynk Music" },
+                    { price: 699, validity: "Monthly", benefits: "100GB data, Unlimited calls, Disney+ Hotstar" },
+                    { price: 999, validity: "Monthly", benefits: "200GB data, Unlimited calls, All OTT platforms" }
+                ]
+            },
+            Vi: {
+                prepaid: [
+                    { price: 179, validity: "28 days", benefits: "1GB/day, Unlimited calls, 100 SMS/day" },
+                    { price: 249, validity: "28 days", benefits: "1.5GB/day, Unlimited calls, 100 SMS/day", popular: true },
+                    { price: 319, validity: "28 days", benefits: "2GB/day, Unlimited calls, 100 SMS/day" },
+                    { price: 449, validity: "56 days", benefits: "1.5GB/day, Unlimited calls, 100 SMS/day" }
+                ],
+                postpaid: [
+                    { price: 399, validity: "Monthly", benefits: "60GB data, Unlimited calls, Vi Movies & TV" },
+                    { price: 649, validity: "Monthly", benefits: "90GB data, Unlimited calls, Netflix Basic" },
+                    { price: 899, validity: "Monthly", benefits: "120GB data, Unlimited calls, Multiple OTT" }
+                ]
+            },
+            BSNL: {
+                prepaid: [
+                    { price: 107, validity: "28 days", benefits: "1GB/day, Unlimited calls, 100 SMS/day", popular: true },
+                    { price: 187, validity: "28 days", benefits: "2GB/day, Unlimited calls, 100 SMS/day" },
+                    { price: 319, validity: "54 days", benefits: "1GB/day, Unlimited calls, 100 SMS/day" }
+                ],
+                postpaid: [
+                    { price: 199, validity: "Monthly", benefits: "30GB data, Unlimited calls" },
+                    { price: 399, validity: "Monthly", benefits: "80GB data, Unlimited calls" },
+                    { price: 699, validity: "Monthly", benefits: "150GB data, Unlimited calls" }
+                ]
+            }
+        };
+
+        let currentPlanType = 'prepaid';
+        let selectedPlan = null;
+
+        function switchForm(type) {
+            // Update buttons
+            document.getElementById('prepaidBtn').classList.toggle('active', type === 'prepaid');
+            document.getElementById('postpaidBtn').classList.toggle('active', type === 'postpaid');
+
+            // Update forms
+            document.getElementById('prepaidForm').classList.toggle('active', type === 'prepaid');
+            document.getElementById('postpaidForm').classList.toggle('active', type === 'postpaid');
+
+            currentPlanType = type;
+
+            // Reset plans display
+            const activeOperator = document.querySelector('.operator-tab.active').textContent;
+            if (activeOperator !== 'All Plans') {
+                showOperatorPlans(activeOperator);
+            }
+        }
+
+        function loadPlans(operator, type) {
+            if (operator) {
+                showOperatorPlans(operator);
+                // Highlight the selected operator tab
+                document.querySelectorAll('.operator-tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                const operatorTab = Array.from(document.querySelectorAll('.operator-tab'))
+                    .find(tab => tab.textContent === operator);
+                if (operatorTab) {
+                    operatorTab.classList.add('active');
+                }
+            }
+        }
+
+        function showOperatorPlans(operator) {
+            const container = document.getElementById('plansContainer');
+            const loader = document.getElementById('plansLoader');
+
+            // Update active tab
+            document.querySelectorAll('.operator-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Show loader
+            loader.style.display = 'block';
+            container.innerHTML = '';
+
+            setTimeout(() => {
+                loader.style.display = 'none';
+
+                if (operator === 'all') {
+                    container.innerHTML = '<p class="text-muted text-center">Select an operator to view available plans</p>';
+                    return;
+                }
+
+                const plans = plansData[operator]?.[currentPlanType] || [];
+
+                if (plans.length === 0) {
+                    container.innerHTML = '<p class="text-muted text-center">No plans available for selected operator</p>';
+                    return;
+                }
+
+                let plansHtml = '';
+                plans.forEach((plan, index) => {
+                    plansHtml += `
+                        <div class="plan-item" onclick="selectPlan(${plan.price}, '${operator}', ${index})">
+                            ${plan.popular ? '<div class="badge bg-success mb-2">Popular</div>' : ''}
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div class="plan-price">₹${plan.price}</div>
+                                <div class="plan-validity small">${plan.validity}</div>
+                            </div>
+                            <div class="plan-benefits">${plan.benefits}</div>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = plansHtml;
+            }, 300);
+        }
+
+        function selectPlan(price, operator, index) {
+            // Remove previous selection
+            document.querySelectorAll('.plan-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+
+            // Select current plan
+            event.currentTarget.classList.add('selected');
+
+            // Update amount in form
+            const amountInput = currentPlanType === 'prepaid' ?
+                document.getElementById('prepaidAmount') :
+                document.getElementById('postpaidAmount');
+
+            if (amountInput) {
+                amountInput.value = price;
+            }
+
+            // Update operator dropdown
+            const operatorSelect = document.querySelector(`#${currentPlanType}Form select[name="MobileNumber_operator"]`);
+            if (operatorSelect) {
+                operatorSelect.value = operator;
+            }
+
+            selectedPlan = { price, operator, index };
+        }
+
+        // Initialize with default view
+        document.addEventListener('DOMContentLoaded', function() {
+            showOperatorPlans('all');
+        });
+    </script>
+}

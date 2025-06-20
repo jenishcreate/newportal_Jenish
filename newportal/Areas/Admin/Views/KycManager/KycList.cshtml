@@ -1,0 +1,204 @@
+﻿@{
+    ViewData["Title"] = "KYC List";
+}
+
+<form id="csrfForm">@Html.AntiForgeryToken()</form>
+
+<style>
+    /* Enhanced table header */
+    #kycTable thead th {
+        border-bottom: 2px solid #616161 !important;
+        color: #212121;
+        font-weight: 700;
+        font-size: 13px;
+        text-transform: uppercase;
+    }
+
+    #kycTable td {
+        background-color: #ffffff;
+        vertical-align: middle;
+        font-size: 15px;
+        color: #212121;
+    }
+
+        
+      #kycTable td:first-child {
+            font-weight: 600;
+            text-align: center;
+      }
+
+    .status-badge {
+        padding: 0.35em 0.65em;
+        font-size: 13px;
+        border-radius: 0.35rem;
+        font-weight: 600;
+    }
+
+    .badge-pending {
+        background-color: #ffe082;
+        color: #795548;
+    }
+
+    .badge-approved {
+        background-color: #a5d6a7;
+        color: #1b5e20;
+    }
+
+    .badge-rejected {
+        background-color: #ef9a9a;
+        color: #b71c1c;
+    }
+
+    div.dataTables_filter {
+        margin-top: 0.75rem;
+        margin-bottom: 1rem;
+    }
+
+    div.dataTables_wrapper {
+        padding-top: 1rem;
+    }
+
+    .dt-actions {
+        display: flex;
+        gap: 0.4rem;
+    }
+</style>
+
+<div class="container-fluid px-3 mt-3">
+    <h2 class="mb-4 text-center">KYC Pending List</h2>
+
+    <div class="table-responsive">
+        <table id="kycTable" class="table table-bordered align-middle" style="width:100%">
+            <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>Company Name</th>
+                    <th>First Name</th>
+                    <th>Middle Name</th>
+                    <th>DOB</th>
+                    <th>Gender</th>
+                    <th>Address</th>
+                    <th>Aadhaar No</th>
+                    <th>PAN No</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            const token = $('input[name="__RequestVerificationToken"]').val();
+
+            let table = $('#kycTable').DataTable({
+                "ajax": {
+                    "url": "/Admin/KycManager/GetAll",
+                    "type": "POST",
+                    "datatype": "json",
+                    "headers": {
+                        "RequestVerificationToken": token
+                    },
+                    "dataSrc": function (json) {
+                        return json.data;
+                    },
+                    "error": function (xhr) {
+                        console.error("❌ AJAX error:", xhr.responseText);
+                    }
+                },
+                "columns": [
+                    {
+                        "data": null,
+                        "render": function (data, type, row, meta) {
+                            return meta.row + 1; // index
+                        },
+                        "orderable": false
+                    },
+                    { "data": "companyname" },
+                    { "data": "firstName" },
+                    { "data": "middleName" },
+                    {
+                        "data": "dob",
+                        "render": function (data) {
+                            return data ? new Date(data).toLocaleDateString() : '';
+                        }
+                    },
+                    { "data": "gender" },
+                    { "data": "address" },
+                    { "data": "adhar_No" },
+                    { "data": "pan_No" },
+                    {
+                        "data": "status",
+                        "render": function (data) {
+                            switch (data) {
+                                case 0:
+                                case "Pending":
+                                    return '<span class="status-badge badge-pending">Pending</span>';
+                                case 1:
+                                case "Approved":
+                                    return '<span class="status-badge badge-approved">Approved</span>';
+                                case 2:
+                                case "Rejected":
+                                    return '<span class="status-badge badge-rejected">Rejected</span>';
+                                default:
+                                    return '<span class="status-badge bg-secondary">Unknown</span>';
+                            }
+                        }
+                    },
+                    {
+                        "data": "userDataId",
+                        "render": function (data, type, row) {
+                            return `
+                                <div class="dt-actions">
+                                    <a href="/Admin/KycManager/KycDetails?userId=${data}" class="btn btn-primary btn-sm">Details</a>
+                                    <form method="post" action="/Admin/KycManager/Approve" style="display:inline">
+                                        <input type="hidden" name="userId" value="${data}" />
+                                        <input type="hidden" name="__RequestVerificationToken" value="${token}" />
+                                        <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                                    </form>
+                                    <button type="button" class="btn btn-danger btn-sm reject-btn" data-userid="${data}">Reject</button>
+                                </div>
+                            `;
+                        },
+                        "orderable": false
+                    }
+                ],
+                "language": {
+                    "emptyTable": "No KYC entries available yet."
+                },
+                "responsive": true
+            });
+
+            // Reject button click handler with remarks input
+            $(document).on('click', '.reject-btn', function () {
+                const userId = $(this).data('userid');
+                const remarks = prompt("Enter rejection remarks:");
+                if (remarks != null && remarks.trim() !== "") {
+                    $.ajax({
+                        type: "POST",
+                        url: "/Admin/KycManager/Reject",
+                        data: {
+                            userId: userId,
+                            remarks: remarks
+                        },
+                        headers: {
+                            "RequestVerificationToken": token
+                        },
+                        success: function () {
+                            $('#kycTable').DataTable().ajax.reload();
+                        },
+                        error: function () {
+                            alert("Error rejecting KYC.");
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}

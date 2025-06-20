@@ -1,0 +1,50 @@
+﻿
+
+@model RoleManagementVM
+<div class="container px-5">
+ 
+    <hr />
+    <div >
+        <div class="card p-10">
+            <h5 class="card-header text-center">Roles in Portal</h5>
+            <div class="table-responsive text-nowrap">
+                <table class="table text-center">
+                    <thead>
+
+
+                        <tr>
+                            <th>
+                                Role Name
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-border-bottom-0">
+
+                        @foreach (var item in Model.Rolelist)
+                        {
+                            <tr>
+
+                                <td>
+                                    @item
+
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+            <form method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                
+                
+
+                <div class="form-group ">
+                    <center><input type="submit" value="Referesh" class="btn btn-primary " /></center>
+                </div>
+     
+        </form>
+    </div>
+</div>
+
+</div>

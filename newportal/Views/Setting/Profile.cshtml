@@ -1,0 +1,276 @@
+﻿@using Newtonsoft.Json
+@using newportal.Models.ViewModel
+@{
+    ViewData["Title"] = "Account Settings";
+
+    var modelJson = TempData["User_Data"]?.ToString();
+    var inputo = !string.IsNullOrEmpty(modelJson)
+        ? JsonConvert.DeserializeObject<UserData>(modelJson)
+        : null;
+}
+@Html.AntiForgeryToken()
+
+<div class="container py-5">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm rounded-4 border-0">
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush" id="settingsMenu">
+                        <a href="#" class="list-group-item list-group-item-action active py-3 px-4" data-view="Profile">
+                            <i class="bi bi-person-circle me-2"></i> Profile
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action py-3 px-4" data-view="ChangePassword">
+                            <i class="bi bi-shield-lock me-2"></i> Change Password
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action py-3 px-4" data-view="ChangeTPIN">
+                            <i class="bi bi-lock-fill me-2"></i> Change TPIN
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action py-3 px-4" data-view="TwoFactor">
+                            <i class="bi bi-phone me-2"></i> Two-Factor Auth
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <div class="card shadow-sm rounded-4 border-0">
+                <div class="card-body" id="settingsContent">
+                    <!-- Profile Content Loaded Initially -->
+                    <h5>Profile</h5>
+                    <div class="d-flex align-items-center gap-4 pb-4 border-bottom">
+                        <img src="@inputo?.ProfilePicture" alt="Profile" class="rounded-circle" width="100" height="100" id="uploadedAvatar" />
+                        <div>
+                            <label for="upload" class="btn btn-primary me-2 mb-2">
+                                Upload new photo
+                                <input type="file" id="upload" hidden accept="image/*" />
+                            </label>
+                            <button type="button" class="btn btn-outline-secondary mb-2" id="resetProfileImage">Reset</button>
+                            <div class="text-muted">Allowed JPG, PNG, GIF. Max size 800KB.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+<style>
+    .list-group-item.active {
+        background-color: #007bff;
+        color: white;
+        font-weight: 500;
+        border-left: 5px solid #0056b3;
+    }
+
+    .list-group-item {
+        transition: background 0.3s ease;
+        font-size: 16px;
+    }
+
+        .list-group-item:hover {
+            background-color: #f8f9fa;
+        }
+
+    #settingsContent {
+        min-height: 400px;
+        transition: opacity 0.3s ease-in-out;
+        animation: fadeIn 0.4s ease-in-out;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const uploadInput = document.getElementById("upload");
+            const avatarImg = document.getElementById("uploadedAvatar");
+            const resetButton = document.getElementById("resetProfileImage");
+            const originalSrc = avatarImg ? avatarImg.src : "";
+
+            // Upload logic
+            if (uploadInput) {
+                uploadInput.addEventListener("change", function () {
+                    const file = this.files[0];
+                    if (!file) return;
+
+                    const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
+                    if (!allowedTypes.includes(file.type)) {
+                        alert("Only JPG, PNG, or GIF allowed.");
+                        this.value = "";
+                        return;
+                    }
+
+                    if (file.size > 800 * 1024) {
+                        alert("File size must be less than 800KB.");
+                        this.value = "";
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        avatarImg.src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+
+                    const formData = new FormData();
+                    formData.append("profileImage", file);
+
+                    const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+                    const headers = {};
+                    if (tokenInput) {
+                        headers["RequestVerificationToken"] = tokenInput.value;
+                    }
+
+                    fetch("/Setting/UploadProfilePicture", {
+                        method: "POST",
+                        headers: headers,
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            avatarImg.src = data.imageUrl;
+                            alert("Profile picture updated successfully.");
+                        } else {
+                            throw new Error(data.message || "Unknown error.");
+                        }
+                    })
+                    .catch(error => {
+                        alert("Error: " + error.message);
+                        avatarImg.src = originalSrc;
+                        this.value = "";
+                    });
+                });
+            }
+
+            if (resetButton) {
+                resetButton.addEventListener("click", function () {
+                    avatarImg.src = originalSrc;
+                    uploadInput.value = "";
+                });
+            }
+
+            // Sidebar Navigation AJAX Loader
+            document.querySelectorAll('#settingsMenu a').forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    document.querySelectorAll('#settingsMenu a').forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+
+                    const viewName = this.getAttribute('data-view');
+                    fetch(`/setting/LoadPartial?viewName=${viewName}`)
+                        .then(res => res.text())
+                        .then(html => {
+                            const container = document.getElementById('settingsContent');
+                            container.style.opacity = 0;
+                            setTimeout(() => {
+                                container.innerHTML = html;
+                                container.style.opacity = 1;
+
+                                if (viewName === "TwoFactor") {
+                                    var toggle = document.getElementById("Enable2FA");
+                                    if (toggle) {
+                                        toggle.addEventListener("change", function () {
+                                            var  Enable2FA =  document.getElementById('settingsContent');
+                                            fetch(`/Setting/ToggleTwoFactor/${Enable2FA}`, {
+                                                method: "POST",
+                                                headers: {
+                                                    'Content-Type': 'application/json',
+                                                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                                                }
+                                            }).then(response => {
+                                                alert(response.ok ? "2FA updated successfully." : "Failed to update 2FA.");
+                                            });
+                                        });
+                                    }
+                                }
+                                if( viewName == "ChangeTPIN"){
+                                            const sendOtpBtn = document.getElementById('sendOtpBtn');
+                                             sendOtpBtn.addEventListener('click', sendOtp);
+                                }
+                            }, 200);
+                        });
+                });
+            });
+        });
+
+    </script>
+    <script>
+
+        function sendOtp() {
+            const sendOtpBtn = document.getElementById('sendOtpBtn');
+            const otpInput = document.getElementById('otpInput');
+            const newTpin = document.getElementById('newTpin');
+            const confirmTpin = document.getElementById('confirmTpin');
+            const toggleBtns = document.querySelectorAll("button.btn-outline-secondary");
+            const updateBtn = document.getElementById('updateBtn');
+
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+            sendOtpBtn.disabled = true;
+            sendOtpBtn.innerText = "Sending OTP...";
+            console.log("hello");
+            fetch('/Setting/SendTPINOtp', {
+                method: 'POST',
+                headers: {}
+
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to send OTP');
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    sendOtpBtn.innerText = "OTP Sent";
+                    otpInput.disabled = false;
+                    newTpin.disabled = false;
+                    confirmTpin.disabled = false;
+                    toggleBtns.forEach(btn => btn.disabled = false);
+                    updateBtn.disabled = false;
+                } else {
+                    sendOtpBtn.disabled = false;
+                    sendOtpBtn.innerText = "Send OTP";
+                    alert(data.message || "Error sending OTP");
+                }
+            })
+            .catch(error => {
+                sendOtpBtn.disabled = false;
+                sendOtpBtn.innerText = "Send OTP";
+                alert(error.message || "Unexpected error");
+            });
+        }
+
+        // Toggle password visibility function
+        function toggleVisibility(inputId, button) {
+            const input = document.getElementById(inputId);
+            const icon = button.querySelector('i');
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.replace("bi-eye", "bi-eye-slash");
+            } else {
+                input.type = "password";
+                icon.classList.replace("bi-eye-slash", "bi-eye");
+            }
+        }
+
+        // Attach event handler when DOM loaded
+        
+       
+    </script>
+}

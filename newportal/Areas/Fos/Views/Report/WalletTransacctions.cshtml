@@ -1,0 +1,150 @@
+﻿@{
+    ViewData["Title"] = "Retailer List";
+}
+
+<form id="csrfForm">@Html.AntiForgeryToken()</form>
+
+<style>
+    /* Custom table header background */
+    #retailerTable thead th {
+        border-bottom: 2px solid #616161 !important;
+        color: #212121;
+        font-weight: 700;
+        font-size: 13px;
+        text-transform: uppercase;
+    }
+
+    #retailerTable td {
+        background-color: #ffffff;
+        vertical-align: middle;
+        font-size: 15px;
+        color: #212121;
+    }
+
+        #retailerTable td:first-child {
+            font-weight: 600;
+            text-align: center;
+        }
+
+    div.dataTables_filter {
+        margin-top: 0.75rem;
+        margin-bottom: 1rem;
+    }
+
+    /* Spacing between columns */
+    #retailerTable td, #retailerTable th {
+        padding: 0.6rem 1rem !important;
+        vertical-align: middle;
+    }
+
+    .dt-actions {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 0.25rem;
+    }
+</style>
+
+<div class="container-fluid px-3 mt-3">
+    <h2 class="mb-3 text-center mt-3">All Wallet Transactions</h2>
+
+    <div class="table-responsive">
+        <table id="retailerTable" class="table table-sm table-bordered align-middle" style="width:100%">
+            <thead>
+                <tr>
+                    <th>No</th> <!-- Index Column Added -->
+                    
+                    <th>FromUserId</th>
+                    <th>ToUserId</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Amount</th>
+                    <th>Linked Service TransactionId</th>
+                    <th>TransactionType</th>
+                    <th>InitiatedByUserId</th>
+                    <th>remarks</th>
+                  
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            const token = $('input[name="__RequestVerificationToken"]').val();
+
+            $('#retailerTable').DataTable({
+                "ajax": {
+                    "url": "/Admin/Report/WalletTransacctionsJson",
+                    "type": "POST",
+                    "datatype": "json",
+                    "headers": {
+                        "RequestVerificationToken": token
+                    },
+                    "dataSrc": function (json) {
+                        return json.data;
+                    },
+                    "error": function (xhr) {
+                        console.error("❌ AJAX error:", xhr.responseText);
+                    }
+                },
+                "columns": [
+                    {
+                        "data": null,
+                        "render": function (data, type, row, meta) {
+                            return meta.row + 1;
+                        },
+                        "orderable": false
+                    },
+                   
+                    { "data": "fromUserId" },
+
+                    { "data": "toUserId" },
+                    { "data": "date",
+                        "render": function (data) {
+                            return data ? new Date(data).toLocaleDateString() : '';
+                        }
+                    },
+                    { "data": "date",
+                        "render": function (data) {
+                            return data ? new Date(data).toLocaleTimeString() : '';
+                        }
+                    },
+                    { "data": "amount" },
+                    { "data": "linkedServiceTransactionId" },
+
+                    { "data": "transactionType",
+                    "render": function (data)
+                        {
+                            switch (data) 
+                            {
+                                case 0:
+                                case "Credit":
+                                   return '<span class="badge bg-success">Credied To Wallet</span>';
+                                case 1:
+                                case "Debit":
+                                   return '<span class="badge bg-danger">Debited User Wallet</span>';
+                                default:
+                                    return '<span class="badge bg-secondary">Unknown</span>';
+                            }
+                        }
+                    },
+
+
+
+                    { "data": "initiatedByUserId"   },
+                    { "data": "remarks" }
+                ],
+                "language": {
+                    "emptyTable": "No retailers available yet."
+                },
+                "responsive": true
+            });
+        });
+    </script>
+}

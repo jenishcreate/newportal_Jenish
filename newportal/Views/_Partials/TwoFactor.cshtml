@@ -1,0 +1,56 @@
+@{
+    ViewData["Title"] = "Two-Factor Authentication";
+    bool is2FAEnabled = ViewBag.Is2FAEnabled ?? false;
+}
+
+
+
+<div class="card">
+    <div class="card-body">
+        <h5>Two-Factor Authentication</h5>
+        <div class="form-check form-switch mt-3">
+            <input class="form-check-input" type="checkbox" id="Enable2FA" @(is2FAEnabled ? "checked" : "") />
+            <label class="form-check-label" for="Enable2FA">
+                Enable Two-Factor Authentication (2FA)
+            </label>
+        </div>
+        <small class="text-muted" id="toggleStatusMessage"></small>
+    </div>
+</div>
+
+@section Scripts {
+  
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    statusMessage.textContent = data.message;
+                    statusMessage.classList.remove("text-danger");
+                    statusMessage.classList.add("text-success");
+                } else {
+                    statusMessage.textContent = data.message;
+                    statusMessage.classList.remove("text-success");
+                    statusMessage.classList.add("text-danger");
+                    revert checkbox if  failed
+                    toggle.checked = !isEnabled;
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                statusMessage.textContent = "An error occurred.";
+                statusMessage.classList.remove("text-success");
+                statusMessage.classList.add("text-danger");
+                revert checkbox if error
+                toggle.checked = !isEnabled;
+            });
+        });
+    });
+
+
+            
+</script>
+
+
+}

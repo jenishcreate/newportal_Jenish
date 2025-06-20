@@ -1,0 +1,148 @@
+﻿@{
+    ViewData["Title"] = " Distributor Commission List";
+}
+
+<!-- Anti-forgery token for secure AJAX -->
+<form id="csrfForm">@Html.AntiForgeryToken()</form>
+
+<style>
+    #DistributorTable thead th {
+        border-bottom: 2px solid #616161 !important;
+        color: #212121;
+        font-weight: 700;
+        font-size: 13px;
+        text-transform: uppercase;
+    }
+
+    #DistributorTable td {
+        background-color: #ffffff;
+        vertical-align: middle;
+        font-size: 15px;
+        color: #212121;
+    }
+
+        #DistributorTable td:first-child {
+            font-weight: 600;
+            text-align: center;
+        }
+
+    div.dataTables_filter {
+        margin-top: 0.75rem;
+        margin-bottom: 1rem;
+    }
+
+    #DistributorTable td, #DistributorTable th {
+        padding: 0.6rem 1rem !important;
+        vertical-align: middle;
+    }
+
+    .dt-actions {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 0.25rem;
+    }
+</style>
+
+<div class="container-fluid px-3 mt-3">
+    <h3 class="mb-3 text-center mt-3"> Distributors Commission Structure</h3>
+
+    <div class="table-responsive">
+        <table id="DistributorTable" class="table table-sm table-bordered align-middle" style="width:100%">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Username</th>
+                    <th>DMT</th>
+                    <th>Recharge</th>
+                    <th>DTH</th>
+                    <th>Electricity</th>
+                    <th>Water</th>
+                    <th>Insurance</th>
+                    <th>CC Bill</th>
+                    <th>CC BBPS</th>
+                    <th>Payout</th>
+                    <th>Move to Bank</th>
+                    <th>Indo Nepal</th>
+                    <th>Travel</th>
+                    <th>POS</th>
+                    <th>CMS</th>
+                    <th>Loan & CC</th>
+                    <th>AEPS</th>
+                    <th>PG1</th>
+                    <th>PG2</th>
+                    <th>PG3</th>
+                    <th>PG4</th>
+                    <th> Change </th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+        <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+        <script>
+            $(document).ready(function () {
+                const token = $('input[name="__RequestVerificationToken"]').val();
+
+            $('#DistributorTable').DataTable({
+                    "ajax": {
+                    "url": "/Admin/UserCommission/DistributorListJson",
+                        "type": "POST",
+                        "datatype": "json",
+                        "headers": {
+                            "RequestVerificationToken": token
+                        },
+                        "dataSrc": function (json) {
+                            return json.data;
+                        }
+                    },
+                   "columns": [
+                        {
+                            "data": null,
+                            "render": function (data, type, row, meta) {
+                                return meta.row + 1;
+                            },
+                            "orderable": false
+                        },
+                        { "data": "username" },
+                              { "data": "dmt", "render": d => `${d}%` },
+                    { "data": "recharge", "render": d => `${d}%` },
+                    { "data": "dth", "render": d => `${d}%` },
+                    { "data": "electricityBill", "render": d => `${d}%` },
+                    { "data": "waterBill", "render": d => `${d}%` },
+                    { "data": "insurance", "render": d => `${d}%` },
+                    { "data": "ccBill", "render": d => `${d}%` },
+                    { "data": "ccBillBbps", "render": d => `${d}%` },
+                    { "data": "payoutRate", "render": d => `${d}%` },
+                    { "data": "moveToBank", "render": d => `${d}%` },
+                    { "data": "indoNepal", "render": d => `${d}%` },
+                    { "data": "travelBooking", "render": d => `${d}%` },
+                    { "data": "pos", "render": d => `${d}%` },
+                    { "data": "cms", "render": d => `${d}%` },
+                    { "data": "loansAndCreditCard", "render": d => `${d}%` },
+                    { "data": "aeps", "render": d => `${d}%` },
+                    { "data": "pG1", "render": d => `${d}%` },
+                    { "data": "pG2", "render": d => `${d}%` },
+                    { "data": "pG3", "render": d => `${d}%` },
+                    { "data": "pG4", "render": d => `${d}%` },
+                        {
+                            "data": "applicationUserId",
+                            "render": function (data, type, row, meta) {
+                        return `<a href="/Admin/UserCommission/EditCommission?userId=${data}" class="btn btn-outline-primary btn-sm"> Change
+                         <i class="bx bx-edit-alt"></i></a>`;
+                            },
+                            "orderable": true
+                        }
+                    ],
+                    "language": {
+                        "emptyTable": "No commission data available."
+                    },
+                    "responsive": true
+                });
+            });
+        </script>
+}

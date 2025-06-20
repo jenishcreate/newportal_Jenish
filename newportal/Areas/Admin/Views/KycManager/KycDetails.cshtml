@@ -1,0 +1,263 @@
+﻿@model newportal.Models.UserData
+
+<div class="container-fluid px-4 w-100">
+    <div class="card mt-4 shadow">
+
+        <h2 class="mt-3 text-center">KYC Details</h2>
+        <div class="card-body mt-4">
+
+            <a asp-area="Admin" asp-action="KycList" asp-controller="KycManager" class="btn btn-outline-secondary mb-5"> ← Back</a>
+        </div>
+        <!-- Modern Verification Boxes -->
+        <div class="row mb-4 text-center justify-content-center" id="verificationStatuses">
+           
+            <div class="col-md-2 mb-2">
+                <div id="aadhaarStatus" class="status-box">Aadhaar<br><small>⏳ Pending</small></div>
+            </div>
+            <div class="col-md-2 mb-2">
+                <div id="panStatus" class="status-box">PAN<br><small>⏳ Pending</small></div>
+            </div>
+            <div class="col-md-2 mb-2">
+                <div id="phoneStatus" class="status-box">Phone<br><small>⏳ Pending</small></div>
+            </div>
+            <div class="col-md-2 mb-2">
+                <div id="emailStatus" class="status-box">Email<br><small>⏳ Pending</small></div>
+            </div>
+            <div class="col-md-2 mb-2">
+                <div id="whatsappStatus" class="status-box">WhatsApp<br><small>⏳ Pending</small></div>
+            </div>
+        </div>
+
+        <div class="card-body mt-4">
+           
+            <input id="userid" value="@Model.UserDataId" hidden />
+
+            <!-- Personal Details -->
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">First Name:</label>
+                    <div>@Model.FirstName</div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Middle Name:</label>
+                    <div>@Model.MiddleName</div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Last Name:</label>
+                    <div>@Model.LastName</div>
+                </div>
+            </div>
+            <br />
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Date of Birth:</label>
+                    <div>@Model.DOB</div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Gender:</label>
+                    <div>@Model.Gender</div>
+                </div>
+            </div>
+            <br />
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Aadhaar Number:</label>
+                    <div>@Model.Adhar_No</div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">PAN Number:</label>
+                    <div>@Model.Pan_No</div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Company Name:</label>
+                    <div>@Model.Companyname</div>
+                </div>
+            </div>
+            <br />
+            <div class="row mb-3">
+                <div class="col-md-8">
+                    <label class="form-label fw-bold">Address:</label>
+                    <div>@Model.Address</div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">City:</label>
+                    <div>@Model.City</div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">State:</label>
+                    <div>@Model.State</div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Country:</label>
+                    <div>@Model.Country</div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Pin Code:</label>
+                    <div>@Model.PinCode</div>
+                </div>
+            </div>
+            <br />
+            <hr />
+            <h5 class="text-muted mt-4 mb-3">Uploaded Documents</h5>
+
+            <!-- Images -->
+            <div class="row mb-3 text-center">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Profile Picture:</label>
+                    <div>
+                        @if (!string.IsNullOrEmpty(Model.ProfilePicture))
+                        {
+                            <img src="@Model.ProfilePicture" class="img-thumbnail popup-img" width="200" height="150" data-src="@Model.ProfilePicture" />
+                        }
+                        else
+                        {
+                            <span>No image</span>
+                        }
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Aadhaar Front:</label>
+                    <div>
+                        @if (!string.IsNullOrEmpty(Model.Adhar_Front_Photo_Url))
+                        {
+                            <img src="@Model.Adhar_Front_Photo_Url" class="img-thumbnail popup-img" width="200" height="150" data-src="@Model.Adhar_Front_Photo_Url" />
+                        }
+                        else
+                        {
+                            <span>No image</span>
+                        }
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Aadhaar Back:</label>
+                    <div>
+                        @if (!string.IsNullOrEmpty(Model.Adhar_Back_Photo_Url))
+                        {
+                            <img src="@Model.Adhar_Back_Photo_Url" class="img-thumbnail popup-img" width="200" height="150" data-src="@Model.Adhar_Back_Photo_Url" />
+                        }
+                        else
+                        {
+                            <span>No image</span>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3 text-center">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">PAN Image:</label>
+                    <div>
+                        @if (!string.IsNullOrEmpty(Model.Pan_Photo_Url))
+                        {
+                            <img src="@Model.Pan_Photo_Url" class="img-thumbnail popup-img" width="200" height="150" data-src="@Model.Pan_Photo_Url" />
+                        }
+                        else
+                        {
+                            <span>No image</span>
+                        }
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Cancelled Cheque Image:</label>
+                    <div>
+                        @if (!string.IsNullOrEmpty(Model.Blank_Check_Photo_Url))
+                        {
+                            <img src="@Model.Blank_Check_Photo_Url" class="img-thumbnail popup-img" width="200" height="150" data-src="@Model.Blank_Check_Photo_Url" />
+                        }
+                        else
+                        {
+                            <span>No image</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Image Preview -->
+<div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-labelledby="imagePreviewLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-light">
+            <div class="modal-header border-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" class="img-fluid rounded shadow" style="max-height: 80vh;" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const modal = new bootstrap.Modal(document.getElementById("imagePreviewModal"));
+            const modalImg = document.getElementById("modalImage");
+
+            document.querySelectorAll(".popup-img").forEach(img => {
+                img.addEventListener("click", function () {
+                    modalImg.src = img.getAttribute("data-src");
+                    modal.show();
+                });
+            });
+
+            const userId = document.getElementById("userid").value;
+
+            fetch(`/Admin/KycManager/Adhaparnverification?userId=${userId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                updateStatus('aadhaarStatus', data.adharVerified, 'Aadhaar');
+                updateStatus('panStatus', data.panVerified, 'PAN');
+                updateStatus('phoneStatus', data.phoneVerified, 'Phone');
+                updateStatus('emailStatus', data.emailVerified, 'Email');
+                updateStatus('whatsappStatus', data.whatsappVerified, 'WhatsApp');
+            });
+
+            function updateStatus(id, value, label) {
+                const el = document.getElementById(id);
+                if (value === true) {
+                    el.className = 'status-box verified';
+                    el.innerHTML = `${label}<br><small>✅ Verified</small>`;
+                } else {
+                    el.className = 'status-box unverified';
+                    el.innerHTML = `${label}<br><small>❌ Unverified</small>`;
+                }
+            }
+        });
+    </script>
+
+    <style>
+        .status-box {
+            padding: 12px;
+            border: 2px solid #dc3545;
+            border-radius: 10px;
+            background-color: #f8d7da;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        }
+
+            .status-box.verified {
+                background-color: #d4edda;
+                border-color: #28a745;
+            }
+
+            .status-box.unverified {
+                background-color: #f8d7da;
+                border-color: #dc3545;
+            }
+
+            .status-box small {
+                font-weight: normal;
+            }
+    </style>
+}
